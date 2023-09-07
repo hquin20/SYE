@@ -1,0 +1,67 @@
+---
+title: "Exploratory Plots"
+author: "Hailey Quintavalle"
+date: "2023-09-04"
+output: html_document
+---
+
+
+```{r message=FALSE, warning=FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+# read in the data manually
+raw_bechdel <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09
+                        /raw_bechdel.csv')
+movies <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/movi
+                   es.csv')
+```
+
+
+```{r}
+hist(raw_bechdel$year)
+hist(movies2$year)
+hist(as.numeric(movies2$domgross))
+hist(as.numeric(movies2$intgross))
+```
+
+
+```{r}
+movies2 <- movies %>% mutate(binary_test = if_else(binary == "PASS", 1, 0))
+table(movies2$binary_test)
+```
+
+```{r}
+hist(movies$imdb_votes)
+hist(movies$imdb_rating)
+plot(movies$imdb_votes~movies$imdb_rating)
+```
+
+```{r}
+movies %>% ggplot(mapping = aes(x =  imdb_rating)) +
+  geom_histogram()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
