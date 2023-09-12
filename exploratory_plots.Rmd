@@ -10,29 +10,28 @@ output: html_document
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(stringr)
 ```
 
 
 ```{r message=FALSE, warning=FALSE}
 # read in the data manually
-raw_bechdel <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09
-                        /raw_bechdel.csv')
-movies <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/movi
-                   es.csv')
+raw_bechdel <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/raw_bechdel.csv')
+movies <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/movies.csv')
 ```
 
 
 ```{r}
 hist(raw_bechdel$year)
-hist(movies2$year)
+hist(movies$year)
 hist(as.numeric(movies2$domgross))
 hist(as.numeric(movies2$intgross))
 ```
 
 
 ```{r}
-movies2 <- movies %>% mutate(binary_test = if_else(binary == "PASS", 1, 0))
-table(movies2$binary_test)
+movies <- movies %>% mutate(binary_test = if_else(binary == "PASS", 1, 0))
+table(movies$binary_test)
 ```
 
 ```{r}
@@ -48,13 +47,64 @@ movies %>% ggplot(mapping = aes(x =  imdb_rating)) +
 
 
 
+-------------------------------------------------------------------------------------------------------
+
+```{r}
+summary(lm(binary_test~ + budget + year, data = movies2))
+```
+
+# Look at plot descriptions
+# make everything lowercase
+# filter into stringr
+# seach for "women" ?
 
 
 
+```{r}
+movies$plot <- str_to_lower(movies$plot)
+movies %>% filter(str_detect(plot, " woman | women | she | her | girl "))
+
+movies %>%
+  mutate(women = str_detect(plot, " woman | women | she | her | girl ")) %>% 
+  ggplot(. , mapping = aes(x = factor(women), y = imdb_rating)) +
+  geom_boxplot()
+```
+
+```{r}
+movies %>%
+  mutate(women = str_detect(plot, " woman | women | she | her | girl ")) %>% 
+  ggplot(. , mapping = aes(x = factor(women), y = year)) +
+  geom_boxplot()
+```
 
 
 
+```{r}
+movies %>% 
+  mutate(women = str_detect(plot, " woman | women | she | her | girl ")) %>% 
+  ggplot(. , mapping = aes(x = factor(women), y = binary_test, color = clean_test)) +
+  geom_jitter()
+```
 
+
+```{r}
+movies %>%
+  ggplot(. , mapping = aes(x = factor(binary), y = imdb_votes)) +
+  geom_boxplot()
+```
+
+
+```{r}
+movies %>%
+  ggplot(. , mapping = aes(x = factor(binary), y = year)) +
+  geom_boxplot()
+```
+
+```{r}
+movies %>%
+  ggplot(. , mapping = aes(x = factor(binary), y = budget, color = clean_test)) +
+  geom_boxplot()
+```
 
 
 
