@@ -58,21 +58,20 @@ summary(lm(binary_test~ + budget + year, data = movies2))
 # filter into stringr
 # seach for "women" ?
 
-
-
 ```{r}
 movies$plot <- str_to_lower(movies$plot)
-movies %>% filter(str_detect(plot, " woman | women | she | her | girl "))
+# movies %>% filter(str_detect(plot, " woman | women | she | her | girl "))
+
+movies <- movies %>% mutate(women = str_detect(plot, " woman | women | she | her | girl "))
 
 movies %>%
-  mutate(women = str_detect(plot, " woman | women | she | her | girl ")) %>% 
   ggplot(. , mapping = aes(x = factor(women), y = imdb_rating)) +
   geom_boxplot()
+
 ```
 
 ```{r}
 movies %>%
-  mutate(women = str_detect(plot, " woman | women | she | her | girl ")) %>% 
   ggplot(. , mapping = aes(x = factor(women), y = year)) +
   geom_boxplot()
 ```
@@ -81,7 +80,6 @@ movies %>%
 
 ```{r}
 movies %>% 
-  mutate(women = str_detect(plot, " woman | women | she | her | girl ")) %>% 
   ggplot(. , mapping = aes(x = factor(women), y = binary_test, color = clean_test)) +
   geom_jitter()
 ```
@@ -102,14 +100,33 @@ movies %>%
 
 ```{r}
 movies %>%
-  ggplot(. , mapping = aes(x = factor(binary), y = budget, color = clean_test)) +
+  ggplot(. , mapping = aes( y = imdb_rating, color = clean_test)) +
   geom_boxplot()
 ```
 
 
+```{r}
+movies %>%
+  ggplot(. , mapping = aes( y = budget, x = factor(women), color = women)) +
+  geom_boxplot()
+```
+
+```{r}
+movies %>%
+  ggplot(. , mapping = aes( y = budget, x = factor(binary_test), color = women)) +
+  geom_boxplot()
+```
 
 
+```{r}
+movies %>%
+  ggplot(. , mapping = aes(x = factor(binary), y = women)) +
+  geom_jitter()
+```
 
+```{r}
+movies %>% filter(binary_test == 0, women == "TRUE") %>% select(title, plot) # is binary variable really accurate?
+```
 
 
 
