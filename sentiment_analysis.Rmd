@@ -1,0 +1,89 @@
+---
+title: "sentiment analysis"
+author: "Hailey Quintavalle"
+date: "2023-10-01"
+output: html_document
+---
+
+
+```{r message=FALSE, warning=FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyverse)
+library(here)
+library(tidytext)
+library(textdata)
+afinn <- get_sentiments("afinn")
+bing <- get_sentiments("bing")
+nrc <- get_sentiments("nrc")
+```
+
+```{r message=FALSE, warning=FALSE}
+# read in the data manually
+raw_bechdel <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/raw_bechdel.csv')
+movies <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/movies.csv')
+```
+
+Create data set where each row is a word and there is a column for each word's sentiment (positive/negative or fear/anger/joy/etc.).
+
+```{r}
+movies$plot <- str_to_lower(movies$plot)
+plot <- movies %>% select(plot, title) %>% unnest_tokens(output = "word", input = "plot")
+plot_stop <- anti_join(plot, stop_words, by = c("word" = "word"))
+```
+
+```{r}
+plot_afinn <- plot_stop %>% inner_join(afinn)
+plot_bing <- plot_stop %>% inner_join(bing)
+plot_nrc <- plot_stop %>% inner_join(nrc)
+
+movie_sentiment <- plot_afinn %>% 
+  summarise(sentiment_score = sum(value))
+```
+
+
+```{r}
+movies2 <- movies2 %>% inner_join(movie_sentiment)
+movies2 %>% select(title, sentiment_score)
+```
+
+```{r}
+hist(movies2$sentiment_score) # general overview of all sentiment scores
+```
+
+```{r}
+movies2 %>% ggplot(mapping = aes(x = factor(binary), y = sentiment_score)) +
+  geom_boxplot()
+```
+
+```{r}
+movies2 %>% ggplot(mapping = aes(x = clean_test, y = sentiment_score, color = clean_test)) +
+  geom_boxplot()
+```
+
+ok = passes test
+dubious = passes test, but still biased
+men = women only talk about men
+notalk = women don't talk to each other
+nowomen = fewer than two women
+
+```{r}
+movies_bing <- movies %>% inner_join(plot_bing)
+movies_nrc <- movies %>% inner_join(plot_nrc)
+```
+
+```{r}
+movies_bing %>% select(title, sentiment) %>% head()
+```
+
+```{r}
+movies_nrc %>% select(title, sentiment) %>% filter(title == "Grown Ups 2")
+```
+
+
+
+
+
+
