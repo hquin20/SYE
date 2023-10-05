@@ -1,3 +1,16 @@
+## October 19
+
+1. Wrangle data so that each row corresponds to a movie-sentiment combination with a column for whether or not the sentiment appeared.
+
+2. Make plots in sketches.
+
+```
+plot_nrc |> mutate(sentiment = as.factor(sentiment),
+                   title = as.factor(title)) |>
+  group_by(sentiment, title, .drop = FALSE) |>
+  summarise(count_sent = n())
+```
+
 ## For October 5
 
 1. Create data set where each row is a word and there is a column for each word's sentiment (positive/negative or fear/anger/joy/etc.).
