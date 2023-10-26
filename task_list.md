@@ -1,3 +1,9 @@
+## For November 2
+
+1. Update heat maps to proportions.
+
+2. Informal 1-2 paragraph write-up of progress so far.
+
 ## October 19
 
 1. Wrangle data so that each row corresponds to a movie-sentiment combination with a column for whether or not the sentiment appeared.
