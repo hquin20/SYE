@@ -32,6 +32,8 @@ plot <- movies %>% select(plot, title) %>% unnest_tokens(output = "word", input 
 plot_stop <- anti_join(plot, stop_words, by = c("word" = "word"))
 ```
 
+
+
 ```{r}
 plot_afinn <- plot_stop %>% inner_join(afinn)
 plot_bing <- plot_stop %>% inner_join(bing)
@@ -87,6 +89,7 @@ movies_nrc <- movies2 %>% inner_join(plot_nrc)
 movies_bing %>% select(title, sentiment) %>% head()
 ```
 
+just an example:
 ```{r}
 movies_nrc %>% select(title, sentiment, count_sent) %>% filter(title == "Grown Ups 2")
 ```
@@ -105,13 +108,6 @@ movies_bing %>%
 
 
 
-heat map (or jitter)
-geom_tile()
-fill = count
-
-
-
-
 
 ```{r}
 movies_nrc %>%
@@ -121,13 +117,45 @@ movies_nrc %>%
   theme(legend.position = "none")
 ```
 
-plot true/false for anger on x-axis and plot pass/fail on y-axis w/ geom_jitter()
 ```{r}
-nrc_anger <- plot_nrc %>% 
+movies_test <- movies2 %>% select(title, binary)
+movies_nrc_test <- plot_nrc %>% inner_join(movies_test) 
+```
+
+
+plot true/false for anger on x-axis and plot pass/fail on axis w/ geom_jitter()
+
+ANGER
+```{r}
+movies_nrc_test %>% mutate(anger = if_else(sentiment == "anger", TRUE, FALSE)) %>%
+  ggplot(. , mapping = aes(x = anger, y = binary, color = binary)) +
+  geom_jitter()
+```
+
+JOY
+```{r}
+movies_nrc_test %>% mutate(joy = if_else(sentiment == "joy", TRUE, FALSE)) %>%
+  ggplot(. , mapping = aes(x = joy, y = binary, color = binary)) +
+  geom_jitter()
+```
+
+
+NEGATIVE
+```{r}
+movies_nrc_test %>% mutate(negative = if_else(sentiment == "negative", TRUE, FALSE)) %>%
+  ggplot(. , mapping = aes(x = count_sent, y = binary, color = count_sent)) +
+  geom_jitter()
 ```
 
 
 
+```{r}
+movies_nrc_test %>% #mutate(negative = if_else(sentiment == "negative", TRUE, FALSE)) %>%
+  ggplot(. , mapping = aes(x = sentiment, y = binary, fill = count_sent)) +
+  geom_tile()
+```
 
-
+heat map (or jitter)
+geom_tile()
+fill = count
 
