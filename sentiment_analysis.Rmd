@@ -206,11 +206,16 @@ movies_nrc %>% mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>
   facet_wrap(~sentiment)
 ```
 
-paragraph or two of where we're at and what we've done so far
 
 
-
-
+```{r}
+movies_nrc %>% 
+  mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>% 
+  group_by(sentiment, count_sent_pass, binary) %>% 
+  mutate(binary_pass = if_else(binary == "PASS", 0, 1)) %>%
+  summarise(n.count = n(), n.count_sent = sum(count_sent_pass == "FALSE")) #%>% 
+  #mutate(row_prop = n.count / n.count_sent) 
+```
 
 
 
