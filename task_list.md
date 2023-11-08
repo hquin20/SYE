@@ -1,3 +1,7 @@
+## For November 9
+
+1. positivity score graph.
+
 ## For November 2
 
 1. Update heat maps to proportions.
