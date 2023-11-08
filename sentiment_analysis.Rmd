@@ -13,6 +13,10 @@ library(tidyverse)
 library(here)
 library(tidytext)
 library(textdata)
+```
+
+
+```{r}
 afinn <- get_sentiments("afinn")
 bing <- get_sentiments("bing")
 nrc <- get_sentiments("nrc")
@@ -158,4 +162,48 @@ movies_nrc_test %>% #mutate(negative = if_else(sentiment == "negative", TRUE, FA
 heat map (or jitter)
 geom_tile()
 fill = count
+
+
+```{r}
+movies_nrc %>% mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>% group_by(sentiment, count_sent_pass, binary) %>% summarise(n.count = n()) %>%
+  ggplot(. , mapping = aes(x = count_sent_pass, y = binary, fill = n.count)) +
+  geom_tile() +
+  facet_wrap(~sentiment)
+```
+
+
+
+```{r}
+movies_nrc %>% #mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>%
+  ggplot(. , mapping = aes(x = count_sent_pass, y = binary, fill = sum())) +
+  geom_tile()
+```
+
+
+sentiment
+count_sent_pass
+binary
+n.count
+
+
+```{r}
+movies_nrc %>% mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>% group_by(sentiment, count_sent_pass, binary) %>% summarise(n.count = n()) %>% mutate(row_prop = n.count/)
+  ggplot(. , mapping = aes(x = count_sent_pass, y = binary, fill = n.count)) +
+  geom_tile() +
+  facet_wrap(~sentiment)
+```
+
+
+
+```{r}
+movies_nrc %>% 
+  mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>% 
+  group_by(sentiment, count_sent_pass, binary) %>% 
+  mutate(binary_pass = if_else(binary == "PASS", 0, 1)) %>%
+  summarise(n.count = n(), n.count_sent = sum(count_sent_pass == "FALSE")) #%>% 
+  #mutate(row_prop = n.count / n.count_sent) 
+```
+
+
+
 

@@ -84,6 +84,11 @@ movies %>%
   geom_jitter()
 ```
 
+ok = passes test
+dubious = passes test, but still biased
+men = women only talk about men
+notalk = women don't talk to each other
+nowomen = fewer than two women
 
 ```{r}
 movies %>%
@@ -120,7 +125,7 @@ movies %>%
 
 ```{r}
 movies %>%
-  ggplot(. , mapping = aes(x = factor(binary), y = women)) +
+  ggplot(. , mapping = aes(x = factor(binary), y = women, color = clean_test)) +
   geom_jitter()
 ```
 
@@ -128,6 +133,8 @@ movies %>%
 movies %>% filter(binary_test == 0, women == "TRUE") %>% select(title, plot) # is binary variable really accurate?
 ```
 
+# why certain movies called dubious?
+# tidytext library
 
 
 
