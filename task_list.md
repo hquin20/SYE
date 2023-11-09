@@ -1,3 +1,10 @@
+## For November 16
+
+1. Investigate genre or why movies fail or another predictor.
+
+For more movies: <https://austinwehrwein.com/post/bechdel/>, <https://bechdeltest.com/api/v1/doc>
+
+
 ## For November 9
 
 1. positivity score graph.
