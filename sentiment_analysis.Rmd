@@ -193,16 +193,95 @@ movies_nrc %>% mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>
   facet_wrap(~sentiment)
 ```
 
+```{r}
+library(forcats)
+```
+
+
+grouping by count_sent_pass:
+```{r}
+movies_nrc %>% 
+  mutate(count_sent_pass = if_else(count_sent > 0, "true", "false")) %>% 
+  mutate(count_sent_pass = fct_relevel(count_sent_pass, c("true", "false"))) %>%
+  group_by(sentiment, count_sent_pass, binary) %>% 
+  mutate(binary_pass = if_else(binary == "PASS", 0, 1)) %>%
+  summarise(n.count = n()) %>% 
+  group_by(sentiment, count_sent_pass) %>%
+  mutate(n.count_sent = sum(n.count)) %>%
+  mutate(row_prop = n.count / n.count_sent) %>%
+  ggplot(. , mapping = aes(x = count_sent_pass, y = binary, fill = row_prop)) +
+  geom_tile() +
+  facet_wrap(~sentiment)
+```
+
+*movies that have joy are more likely to pass than movies that do not have joy
+
+*movies that have trust are less likely to pass than movies that dont have trust
+
+*movies that are positive are less likely to pass than movies that are not
+
+
+
+
+
+grouping by binary:
+```{r}
+movies_nrc %>% 
+  mutate(count_sent_pass = if_else(count_sent > 0, "true", "false")) %>% 
+  mutate(count_sent_pass = fct_relevel(count_sent_pass, c("true", "false"))) %>%
+  group_by(sentiment, count_sent_pass, binary) %>% 
+  mutate(binary_pass = if_else(binary == "PASS", 0, 1)) %>%
+  summarise(n.count = n()) %>% 
+  group_by(sentiment, binary) %>%
+  mutate(n.count_sent = sum(n.count)) %>%
+  mutate(row_prop = n.count / n.count_sent) %>%
+  ggplot(. , mapping = aes(x = count_sent_pass, y = binary, fill = row_prop)) +
+  geom_tile() +
+  facet_wrap(~sentiment)
+```
+
+
+focus on bing**
+```{r}
+movies_bing_score <- movies_bing %>% 
+  select(title, sentiment, binary) %>% 
+  mutate(sentimentp_score = if_else(sentiment == "positive", 1, 0),
+         sentimentn_score = if_else(sentiment == "negative", 1, 0)) %>% 
+  group_by(title) %>% 
+  summarise(positive_score = sum(sentimentp_score), negative_score = sum(sentimentn_score)) %>%
+  mutate(rough_score = positive_score - negative_score) %>%
+  select(title, rough_score)
+
+movies_bing <- movies_bing %>% inner_join(movies_bing_score)
+```
+
+
+hypothesis: negative movies more likely to pass than positive movies
+
+# of positive - # of negative = rough positivity score (rough_score)
+
+scatter plot - ?
 
 
 ```{r}
-movies_nrc %>% 
-  mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>% 
-  group_by(sentiment, count_sent_pass, binary) %>% 
-  mutate(binary_pass = if_else(binary == "PASS", 0, 1)) %>%
-  summarise(n.count = n(), n.count_sent = sum(count_sent_pass == "FALSE")) #%>% 
-  #mutate(row_prop = n.count / n.count_sent) 
+movies_bing %>% 
+  ggplot(
+    mapping = aes(x = rough_score, y = binary, color = binary)) + 
+  geom_jitter()
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
