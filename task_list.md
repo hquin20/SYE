@@ -1,3 +1,10 @@
+## November 30
+
+1. Use updated data frame for sentiment and genre analysis (focusing especially on past decade).
+
+2. Consider a logistic regression model for PASS/FAIL with year, genre, and perhaps their interaction as covariates.
+
+
 ## For November 16
 
 1. Investigate genre or why movies fail or another predictor.
