@@ -165,7 +165,9 @@ fill = count
 
 
 ```{r}
-movies_nrc %>% mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>% group_by(sentiment, count_sent_pass, binary) %>% summarise(n.count = n()) %>%
+movies_nrc %>% mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>% 
+  group_by(sentiment, count_sent_pass, binary) %>% 
+  summarise(n.count = n()) %>%
   ggplot(. , mapping = aes(x = count_sent_pass, y = binary, fill = n.count)) +
   geom_tile() +
   facet_wrap(~sentiment)
@@ -174,7 +176,9 @@ movies_nrc %>% mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>
 
 
 ```{r}
-movies_nrc %>% #mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>%
+movies_nrc %>%
+  mutate(count_sent_pass = if_else(count_sent > 0, "true", "false")) %>% 
+  mutate(count_sent_pass = fct_relevel(count_sent_pass, c("true", "false"))) %>%
   ggplot(. , mapping = aes(x = count_sent_pass, y = binary, fill = sum())) +
   geom_tile()
 ```
@@ -187,7 +191,10 @@ n.count
 
 
 ```{r}
-movies_nrc %>% mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>% group_by(sentiment, count_sent_pass, binary) %>% summarise(n.count = n()) %>% mutate(row_prop = n.count/)
+movies_nrc %>% mutate(count_sent_pass = if_else(count_sent > 0, TRUE, FALSE)) %>% 
+  group_by(sentiment, count_sent_pass, binary) %>% 
+  summarise(n.count = n()) %>% 
+  mutate(row_prop = n.count) %>%
   ggplot(. , mapping = aes(x = count_sent_pass, y = binary, fill = n.count)) +
   geom_tile() +
   facet_wrap(~sentiment)
@@ -240,6 +247,23 @@ movies_nrc %>%
   facet_wrap(~sentiment)
 ```
 
+```{r}
+movies_nrc %>% filter(sentiment == "fear") %>% 
+  group_by(year, binary) %>% summarise(n = n()) %>%
+  ggplot(mapping = aes(x = year, y = n, color = binary)) +
+  geom_point() + 
+  geom_smooth()
+```
+
+
+```{r}
+movies_nrc %>% filter(sentiment == "anger") %>% 
+  group_by(year, binary) %>% summarise(n = n()) %>%
+  ggplot(mapping = aes(x = year, y = n, color = binary)) +
+  geom_point() + 
+  geom_smooth()
+```
+
 
 focus on bing**
 ```{r}
@@ -253,6 +277,8 @@ movies_bing_score <- movies_bing %>%
   select(title, rough_score)
 
 movies_bing <- movies_bing %>% inner_join(movies_bing_score)
+
+movies2 <- movies2 %>% inner_join(movies_bing_score)
 ```
 
 
@@ -267,14 +293,31 @@ scatter plot - ?
 movies_bing %>% 
   ggplot(
     mapping = aes(x = rough_score, y = binary, color = binary)) + 
-  geom_jitter()
+  geom_jitter()  # facet this plot by genre
+
+# try sentiment score and rough positivity score
+```
+
+```{r}
+movies_bing %>% group_by(binary) %>% summarise(m_rough_score = mean(rough_score))
 ```
 
 
+look into genre-
+accounting for genre, difference in positivity scores? (facet)
+separate line for every genre (movies have multiple lines) - similar to plot method
 
 
+look into clean_test over time?
+
+```{r}
+movies_bing %>% head()
+```
 
 
+```{r}
+write.csv(movies2,"C:/Users/Hailey/OneDrive - St. Lawrence University/SYE/SYE/movies2.csv")
+```
 
 
 

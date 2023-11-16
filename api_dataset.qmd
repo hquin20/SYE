@@ -1,0 +1,33 @@
+---
+title: "API Dataset Analysis"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(awtools)
+library(jsonlite)
+```
+
+
+```{r}
+#grab data from the API
+
+movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE)%>%
+  data.frame()%>%
+  mutate(year=as.numeric(year),
+         id=as.numeric(id))
+```
+
+
+```{r}
+movies_api %>% head()
+
+# rating variable: 1 = It has to have at least two [named] women in it
+#                  2 = Who talk to each other
+#                  3 = About something besides a man
+#                  0 = none of the above
+```
+
+
