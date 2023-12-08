@@ -13,3 +13,13 @@ Sentiment Analysis:
 For our sentiment analysis we used three different sets of sentiments to assess our data (bing, nrc, afinn). For all movies, sentiment scores showed a normal distribution centering around -3, on a scale from -10 to 10. Movies that passed the bechdel test could have a slightly higher overall sentiment score than movies that do not. We then assigned movies to an emotion (such as joy, anger, fear, saddness, etc.) and created an array of boxplots of movies that passed/failed in each of these sentiment categories. Heat maps were then used to visually organize the number of movies in each sentiment, separated by movies that pass the bechdel test and those that do not, as well as an array of heat map plots designed to invetigate this for each sentiment category. The next step is to create these heat maps with proportions instead of using number of movies. 
 
 
+Genre Analysis:
+
+We investigated the sentiment of movies that either pass or fail the bechdel test, separated by movie genre. This was done using a rough sentiment score that was created to place a value on the number of posiitve/negative words included in the plot summary. A series of boxplots were created to show these trends, but there are no obvious differences within genres. Looking within each genre specifically, the number of movies that pass and fail the bechdel test was examined over time. Some intertesting trends were seen among these plots. For example, within action movies, the number of movies that fail the test increase at a higher rate than the number of movies that pass the test over time. For comedy movies, the number of movies that pass over time was higher than the number of movies that fail during the mid 2000s, but this trend seems to reverse in the recent decade. This analysis was conducted using the data set used for previous exploratory and sentiment analyses, but only includes movies up until 2013. Future analysis on genre would like to inlcude more movies from the recent decade, so the first step for next semester will be searching for a newer data set. 
+
+
+
+
+
+
+
