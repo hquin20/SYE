@@ -1,0 +1,30 @@
+---
+title: "Regression Analysis"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+movies2 <- read.csv("C:/Users/Hailey/OneDrive - St. Lawrence University/SYE/SYE/movies2.csv")
+```
+
+
+```{r}
+movies2 <- movies2 %>% mutate(binary_0 = ifelse(binary == "PASS", 1, 0))
+
+#mod1 <- glm(binary_0 ~ year + genre + year:genre, data = movies2)
+#summary(mod1)
+
+
+mod_year <- glm(binary_0 ~ year, data = movies2)
+summary(mod_year)
+```
+
+```{r}
+# Goodness of fit test
+# pchisq(__, __,lower.tail = F)
+```
+
+
+
