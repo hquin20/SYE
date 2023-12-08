@@ -43,10 +43,13 @@ movies_api %>% head()
 
 ```{r warning = F}
 ggplotmovies<-movies%>%filter(year>=1967) 
-
 ```
 
+Movie titles are weird/different in the APA dataset? -> cannot join easily with ggplot data set 
 
+-> trying to join genres (and other variables) from the ggplot set to the movies in the api data set
+
+-> to do sentiment analysis --> need plot variable for this? 
 
 
 
