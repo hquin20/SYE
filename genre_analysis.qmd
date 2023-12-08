@@ -22,6 +22,7 @@ bing <- get_sentiments("bing")
 nrc <- get_sentiments("nrc")
 ```
 
+tasks:
 look into genre-
 accounting for genre, difference in positivity scores? (facet)
 separate line for every genre (movies have multiple lines) - similar to plot method
@@ -155,6 +156,6 @@ movies_genre %>% filter(genre == "drama") %>%
 ```
 
 
-
+investigate genre and sentiment analysis with api data set next**
 
 

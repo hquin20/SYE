@@ -4,20 +4,31 @@ format: html
 editor: visual
 ---
 
-```{r}
+```{r warning = F, message = F}
 library(tidyverse)
 library(awtools)
 library(jsonlite)
+library(ggplot2movies)
+```
+
+```{r}
+ggplotmovies <- ggplot2movies::movies
 ```
 
 
 ```{r}
 #grab data from the API
 
-movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE)%>%
-  data.frame()%>%
-  mutate(year=as.numeric(year),
-         id=as.numeric(id))
+#movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE)%>%
+ # data.frame()%>%
+#  mutate(year=as.numeric(year),
+ #        id=as.numeric(id))
+```
+
+
+```{r}
+#write.csv(movies_api,"C:/Users/Hailey/OneDrive - St. Lawrence University/SYE/SYE/movies_api.csv")
+movies_api <- read_csv("C:/Users/Hailey/OneDrive - St. Lawrence University/SYE/SYE/movies_api.csv")
 ```
 
 
@@ -29,5 +40,16 @@ movies_api %>% head()
 #                  3 = About something besides a man
 #                  0 = none of the above
 ```
+
+```{r warning = F}
+ggplotmovies<-movies%>%filter(year>=1967) 
+
+```
+
+
+
+
+
+
 
 
