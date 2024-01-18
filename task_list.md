@@ -1,3 +1,16 @@
+## January 25
+
+1. genre with new data set
+
+ - separate genre and each movie appears more than once (since movies have multiple genres)
+ 
+2. time 
+
+3. interactions - maybe small interaction time and movies passing within genre
+
+- possibly fit model after this is done (more of a future task)
+
+
 ## November 30
 
 1. Use updated data frame for sentiment and genre analysis (focusing especially on past decade).

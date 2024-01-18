@@ -42,7 +42,7 @@ movies_api %>% head()
 ```
 
 ```{r warning = F}
-ggplotmovies<-movies%>%filter(year>=1967) 
+#ggplotmovies<-movies%>%filter(year>=1967) 
 ```
 
 Movie titles are weird/different in the APA dataset? -> cannot join easily with ggplot data set 
