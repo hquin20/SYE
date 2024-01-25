@@ -1,3 +1,11 @@
+## February 1
+
+1. geom_rug() plots for each genre.
+
+2. If time, fit logistic regression model with genre, year, (and interaction?), and make plot.
+
+3. After Monday, lollipop plot of proportion of passing test.
+
 ## January 25
 
 1. genre with new data set
