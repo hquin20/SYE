@@ -2,7 +2,7 @@
 
 1. genre with new data set
 
- - separate genre and each movie appears more than once (since movies have multiple genres)
+ - separate genre so each movie appears more than once (since movies have multiple genres)
  
 2. time 
 

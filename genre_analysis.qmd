@@ -4,13 +4,11 @@ format: html
 editor: visual
 ---
 
-
 ```{r message=F}
 library(tidyverse)
 library(tidytext)
 library(textdata)
 ```
-
 
 ```{r message=FALSE, warning=FALSE}
 # read in the data manually
@@ -22,20 +20,15 @@ bing <- get_sentiments("bing")
 nrc <- get_sentiments("nrc")
 ```
 
-tasks:
-look into genre-
-accounting for genre, difference in positivity scores? (facet)
-separate line for every genre (movies have multiple lines) - similar to plot method
+tasks: look into genre- accounting for genre, difference in positivity scores? (facet) separate line for every genre (movies have multiple lines) - similar to plot method
 
 ```{r}
 movies2 <- read.csv("C:/Users/Hailey/OneDrive - St. Lawrence University/SYE/SYE/movies2.csv")
 ```
 
-
 ```{r}
 movies_genre <- movies2 %>% unnest_tokens(output = "genre", input = "genre")
 ```
-
 
 ```{r}
 movies_genre %>% 
@@ -62,14 +55,11 @@ movies_genre %>% filter(genre == "action") %>%
   coord_flip()
 ```
 
-
-
 ```{r}
 movies_genre %>% filter(genre == "family") %>%
   ggplot(mapping = aes(x = genre, y = sentiment_score, color = binary)) + 
   geom_boxplot() +
   coord_flip()
-
 
 movies_genre %>% filter(genre == "family") %>%
   ggplot(mapping = aes(x = genre, y = rough_score, color = binary)) + 
@@ -82,7 +72,6 @@ movies_genre %>%
   group_by(year, binary) %>% summarise(n = n())
 ```
 
-
 ```{r}
 movies_genre %>% 
   group_by(year, binary) %>% summarise(n = n()) %>% 
@@ -90,8 +79,6 @@ movies_genre %>%
   geom_point() + 
   geom_smooth()
 ```
-
-
 
 ```{r}
 movies_genre %>% filter(genre == "action") %>% 
@@ -127,7 +114,6 @@ movies_genre %>% filter(genre == "romance") %>%
 # be careful --> n is small**
 ```
 
-
 ```{r}
 movies_genre %>% filter(genre == "fantasy") %>% 
   group_by(year, binary) %>% summarise(n = n()) %>%
@@ -135,7 +121,6 @@ movies_genre %>% filter(genre == "fantasy") %>%
   geom_point() + 
   geom_smooth()
 ```
-
 
 ```{r}
 movies_genre %>% filter(genre == "sport") %>% 
@@ -155,7 +140,25 @@ movies_genre %>% filter(genre == "drama") %>%
   geom_smooth()
 ```
 
+investigate genre and sentiment analysis with api data set next\*\*
 
-investigate genre and sentiment analysis with api data set next**
+
+
+
+
+
+1. genre with new data set
+
+ - separate genre so each movie appears more than once (since movies have multiple genres)
+ 
+2. time 
+
+3. interactions - maybe small interaction time and movies passing within genre
+
+
+- possible fit model after this is done (more of a future task)
+
+
+
 
 

@@ -3,6 +3,8 @@ library(rvest)
 
 ## https://datasets.imdbws.com/
 
+library(tidyverse)
+
 test_df <- read_tsv(here::here("title.basics.tsv")) |>
   mutate(imdbid = parse_number(tconst))
 

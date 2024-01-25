@@ -1,0 +1,120 @@
+---
+title: "Genre Analysis: New Data Set"
+format: html
+---
+
+
+```{r message = F, warning=FALSE}
+library(tidyverse)
+```
+
+###------------------------------------------------------------------------------------------------------
+
+test_df <- read_tsv(here::here("data.tsv")) |>    # this line takes very long time to load
+  mutate(imdbid = parse_number(tconst))
+movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE)%>%
+ tibble::tibble()%>%
+  mutate(year=as.numeric(year),
+        id=as.numeric(id),
+        imdbid = as.numeric(imdbid))
+basics.movies <- left_join(movies_api, test_df,
+          by = "imdbid")
+sum(is.na(basics.movies$genres)) ## only 8 missing!!
+basics.movies$genres
+
+###------------------------------------------------------------------------------------------------------
+(don't need this code anymore because I created a new csv file to load in)^^^^
+
+
+```{r message = F, warning=FALSE}
+basics.movies <- read_csv("basics_movies.csv")
+head(basics.movies)
+```
+
+```{r}
+basics.movies <- basics.movies |>separate_rows(genres, sep = ",") # movies appear multiple times for multiple genres
+
+basics.movies <- basics.movies |> mutate(binary = if_else(rating == 3, "PASS", "FAIL"))
+
+```
+
+
+
+```{r}
+basics.movies |>
+  ggplot(mapping = aes(x = binary)) +
+  geom_bar() +
+  facet_wrap(~genres)
+```
+
+
+```{r}
+basics.movies %>% filter(genres == "Drama") %>% 
+  group_by(year, rating) %>% summarise(n = n()) %>%
+  ggplot(mapping = aes(x = year, y = n, color = rating)) +
+  geom_point() + 
+  geom_smooth() +
+  facet_wrap(~rating)
+```
+
+
+*Most of these plots look different from initial genre analysis*
+
+```{r}
+basics.movies %>% filter(genres == "Adventure") %>% 
+  group_by(year, binary) %>% summarise(n = n()) %>%
+  ggplot(mapping = aes(x = year, y = n, color = binary)) +
+  geom_point() + 
+  geom_smooth()
+```
+
+```{r}
+basics.movies %>% filter(genres == "Comedy") %>% 
+  group_by(year, binary) %>% summarise(n = n()) %>%
+  ggplot(mapping = aes(x = year, y = n, color = binary)) +
+  geom_point() + 
+  geom_smooth()
+```
+
+```{r}
+basics.movies %>% filter(genres == "Romance") %>% 
+  group_by(year, binary) %>% summarise(n = n()) %>%
+  ggplot(mapping = aes(x = year, y = n, color = binary)) +
+  geom_point() + 
+  geom_smooth()
+```
+
+```{r}
+basics.movies %>% filter(genres == "Fantasy") %>% 
+  group_by(year, binary) %>% summarise(n = n()) %>%
+  ggplot(mapping = aes(x = year, y = n, color = binary)) +
+  geom_point() + 
+  geom_smooth()
+```
+
+```{r}
+basics.movies %>% filter(genres == "Sport") %>% 
+  group_by(year, binary) %>% summarise(n = n()) %>%
+  ggplot(mapping = aes(x = year, y = n, color = binary)) +
+  geom_point() + 
+  geom_smooth()
+```
+
+```{r}
+basics.movies %>% filter(genres == "Drama") %>% 
+  group_by(year, binary) %>% summarise(n = n()) %>%
+  ggplot(mapping = aes(x = year, y = n, color = binary)) +
+  geom_point() + 
+  geom_smooth()
+```
+
+
+
+
+
+
+
+
+
+
+

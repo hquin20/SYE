@@ -35,7 +35,7 @@ table(movies$binary_test)
 ```
 
 ```{r}
-hist(movies$imdb_votes)
+hist(movies$year)
 hist(movies$imdb_rating)
 plot(movies$imdb_votes~movies$imdb_rating)
 ```
@@ -63,6 +63,7 @@ movies$plot <- str_to_lower(movies$plot)
 # movies %>% filter(str_detect(plot, " woman | women | she | her | girl "))
 
 movies <- movies %>% mutate(women = str_detect(plot, " woman | women | she | her | girl "))
+table(movies$women)
 
 movies %>%
   ggplot(. , mapping = aes(x = factor(women), y = imdb_rating)) +
@@ -72,7 +73,7 @@ movies %>%
 
 ```{r}
 movies %>%
-  ggplot(. , mapping = aes(x = factor(women), y = year)) +
+  ggplot(. , mapping = aes(x = factor(women), y = runtime)) +
   geom_boxplot()
 ```
 
@@ -92,7 +93,7 @@ nowomen = fewer than two women
 
 ```{r}
 movies %>%
-  ggplot(. , mapping = aes(x = factor(binary), y = imdb_votes)) +
+  ggplot(. , mapping = aes(x = factor(binary), y = imdb_rating)) +
   geom_boxplot()
 ```
 
