@@ -6,6 +6,7 @@ format: html
 
 ```{r message = F, warning=FALSE}
 library(tidyverse)
+library(forcats)
 ```
 
 ###------------------------------------------------------------------------------------------------------
@@ -108,10 +109,44 @@ basics.movies %>% filter(genres == "Drama") %>%
   geom_smooth()
 ```
 
+lollipop plot? - possibly faceting by decade?
+
+geom_rug +
+geom_smooth(method = "glm", family = "binomial")
+
+regression model with year and genre as covariates
+
+```{r}
+basics.movies |> 
+  filter(genres == "Drama") |> 
+  mutate(binary = factor(binary)) |>
+  ggplot(mapping = aes(x = year, y = binary, color = binary)) +
+  geom_rug() +
+  geom_smooth(method = "glm", family = "binomial")   ## cannot get this to work !!
+
+```
 
 
+```{r}
+proportion_pass <- basics.movies |> ## select(title, rating, binary, genres, year) |>
+  filter(!genres %in% c("News", "Adult", "Talk-Show", "\\N")) |>
+  group_by(genres) |>
+  mutate(prop_pass = sum(binary == "PASS") / n()) |>
+  filter(!is.na(genres)) |>
+##  filter(decade >= 2000) |>
+  mutate(decade = 10 * (year %/% 10))
+  
 
-
+ggplot(proportion_pass, aes(x = reorder(genres, prop_pass), y = prop_pass)) + 
+  geom_segment(aes(xend = reorder(genres, prop_pass), y = 0, yend = prop_pass), color = "darkseagreen", linewidth = 2) +
+  geom_point(color = "seagreen", size = 3) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 11)) +
+  ylab("Proportion of Movies that Pass") +
+##  facet_wrap(~ decade) +
+  xlab("Genres")
+```
 
 
 
