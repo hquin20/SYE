@@ -1,3 +1,13 @@
+## February 8
+
+1. Clean up plots in genre-analysis-p2.qmd
+
+2. Expand model.
+
+3. Plot model.
+
+4. Create indicator variables for each genre "manually".
+
 ## February 1
 
 1. geom_rug() plots for each genre. 
