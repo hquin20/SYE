@@ -12,16 +12,18 @@ library(tidyverse)
 ```{r}
 movies.model <- read_csv("basics_movies.csv")
 movies.model <- movies.model |>separate_rows(genres, sep = ",") # movies appear multiple times for multiple genres
-movies.model <- movies.model |> mutate(binary = if_else(rating == 3, "PASS", "FAIL"))
+movies.model <- movies.model |> mutate(binary = if_else(rating == 3, "1", "0")) |> 
+  filter(!genres %in% c("News", "Adult", "Talk-Show", "\\N"))
 
 ```
 
 
 ```{r}
 logit_model <- glm(factor(binary) ~ genres + year, data = movies.model, family = binomial)
-summary(logit_model)
+summary(logit_model)    # after only taking out movies with low count
+
+
 # quadratic term for year?
-# filter out genres with low movie count
 # try different variables maybe?
 # indicator variables for genres?
 

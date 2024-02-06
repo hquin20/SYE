@@ -116,25 +116,6 @@ geom_smooth(method = "glm", family = "binomial")
 
 regression model with year and genre as covariates
 
-```{r}
-rug_plots <- basics.movies |> 
-  filter(genres == "Action") |> 
-  mutate(binary = if_else(binary == "PASS", 1, 0))
- # mutate(binary = factor(binary))
-
-rug_plots.pass <- rug_plots |>
-  filter(binary == 1)
-
-rug_plots.fail <- rug_plots |>
-  filter(binary == 0)
-
-ggplot(rug_plots, mapping = aes(x = year, y = binary)) +
-  geom_rug(data = rug_plots.pass, sides = "t") +
-  geom_rug(data = rug_plots.fail, sides = "b") +
-  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F)   ## cannot get this to work !!
-
-```
-
 
 ```{r}
 proportion_pass <- basics.movies |> ## select(title, rating, binary, genres, year) |>
@@ -156,6 +137,118 @@ ggplot(proportion_pass, aes(x = reorder(genres, prop_pass), y = prop_pass)) +
   facet_wrap(~ decade) +
   xlab("Genres")
 ```
+
+
+```{r}
+rug_plots <- basics.movies |> 
+  filter(genres == "Action") |> 
+  mutate(binary = if_else(binary == "PASS", 1, 0))
+ # mutate(binary = factor(binary))
+
+rug_plots.pass <- rug_plots |>
+  filter(binary == 1)
+
+rug_plots.fail <- rug_plots |>
+  filter(binary == 0)
+
+ggplot(data = rug_plots, mapping = aes(x = year, y = binary)) +
+  geom_rug(data = rug_plots.pass, sides = "t", color = "darkblue", size = 1) +
+  geom_rug(data = rug_plots.fail, sides = "b", color = "darkred", size = 1) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F, color = "seagreen")
+```
+
+```{r}
+rug_plots <- basics.movies |> 
+  filter(genres == "Romance") |> 
+  mutate(binary = if_else(binary == "PASS", 1, 0))
+ # mutate(binary = factor(binary))
+
+rug_plots.pass <- rug_plots |>
+  filter(binary == 1)
+
+rug_plots.fail <- rug_plots |>
+  filter(binary == 0)
+
+ggplot(data = rug_plots, mapping = aes(x = year, y = binary)) +
+  geom_rug(data = rug_plots.pass, sides = "t", color = "darkblue", size = 1) +
+  geom_rug(data = rug_plots.fail, sides = "b", color = "darkred", size = 1) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F, color = "seagreen")
+```
+
+```{r}
+rug_plots <- basics.movies |> 
+  filter(genres == "Sport") |> 
+  mutate(binary = if_else(binary == "PASS", 1, 0))
+ # mutate(binary = factor(binary))
+
+rug_plots.pass <- rug_plots |>
+  filter(binary == 1)
+
+rug_plots.fail <- rug_plots |>
+  filter(binary == 0)
+
+ggplot(data = rug_plots, mapping = aes(x = year, y = binary)) +
+  geom_rug(data = rug_plots.pass, sides = "t", color = "darkblue", size = 1) +
+  geom_rug(data = rug_plots.fail, sides = "b", color = "darkred", size = 1) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F, color = "seagreen")
+```
+
+```{r}
+rug_plots <- basics.movies |> 
+  filter(genres == "Adventure") |> 
+  mutate(binary = if_else(binary == "PASS", 1, 0))
+ # mutate(binary = factor(binary))
+
+rug_plots.pass <- rug_plots |>
+  filter(binary == 1)
+
+rug_plots.fail <- rug_plots |>
+  filter(binary == 0)
+
+ggplot(data = rug_plots, mapping = aes(x = year, y = binary)) +
+  geom_rug(data = rug_plots.pass, sides = "t", color = "darkblue", size = 1) +
+  geom_rug(data = rug_plots.fail, sides = "b", color = "darkred", size = 1) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F, color = "seagreen")
+```
+
+```{r}
+rug_plots <- basics.movies |> 
+  filter(genres == "Romance" | genres == "Comedy") |>   # RomCom plot
+  mutate(binary = if_else(binary == "PASS", 1, 0))
+ # mutate(binary = factor(binary))
+
+rug_plots.pass <- rug_plots |>
+  filter(binary == 1)
+
+rug_plots.fail <- rug_plots |>
+  filter(binary == 0)
+
+ggplot(data = rug_plots, mapping = aes(x = year, y = binary)) +
+  geom_rug(data = rug_plots.pass, sides = "t", color = "darkblue", size = 1) +
+  geom_rug(data = rug_plots.fail, sides = "b", color = "darkred", size = 1) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F, color = "seagreen")
+```
+
+```{r}
+rug_plots <- basics.movies |> 
+  filter(genres == "Sci-Fi") |> 
+  mutate(binary = if_else(binary == "PASS", 1, 0))
+ # mutate(binary = factor(binary))
+
+rug_plots.pass <- rug_plots |>
+  filter(binary == 1)
+
+rug_plots.fail <- rug_plots |>
+  filter(binary == 0)
+
+ggplot(data = rug_plots, mapping = aes(x = year, y = binary)) +
+  geom_rug(data = rug_plots.pass, sides = "t", color = "darkblue", size = 1) +
+  geom_rug(data = rug_plots.fail, sides = "b", color = "darkred", size = 1) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F, color = "seagreen")
+```
+
+
+
 
 
 
