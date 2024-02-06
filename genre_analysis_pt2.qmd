@@ -117,12 +117,21 @@ geom_smooth(method = "glm", family = "binomial")
 regression model with year and genre as covariates
 
 ```{r}
-basics.movies |> 
-  filter(genres == "Drama") |> 
-  mutate(binary = factor(binary)) |>
-  ggplot(mapping = aes(x = year, y = binary, color = binary)) +
-  geom_rug() +
-  geom_smooth(method = "glm", family = "binomial")   ## cannot get this to work !!
+rug_plots <- basics.movies |> 
+  filter(genres == "Action") |> 
+  mutate(binary = if_else(binary == "PASS", 1, 0))
+ # mutate(binary = factor(binary))
+
+rug_plots.pass <- rug_plots |>
+  filter(binary == 1)
+
+rug_plots.fail <- rug_plots |>
+  filter(binary == 0)
+
+ggplot(rug_plots, mapping = aes(x = year, y = binary)) +
+  geom_rug(data = rug_plots.pass, sides = "t") +
+  geom_rug(data = rug_plots.fail, sides = "b") +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F)   ## cannot get this to work !!
 
 ```
 
@@ -133,8 +142,8 @@ proportion_pass <- basics.movies |> ## select(title, rating, binary, genres, yea
   group_by(genres) |>
   mutate(prop_pass = sum(binary == "PASS") / n()) |>
   filter(!is.na(genres)) |>
-##  filter(decade >= 2000) |>
-  mutate(decade = 10 * (year %/% 10))
+  mutate(decade = 10 * (year %/% 10))|>
+  filter(decade >= 1980) 
   
 
 ggplot(proportion_pass, aes(x = reorder(genres, prop_pass), y = prop_pass)) + 
@@ -144,7 +153,7 @@ ggplot(proportion_pass, aes(x = reorder(genres, prop_pass), y = prop_pass)) +
   theme_minimal() +
   theme(axis.text.x = element_text(size = 11)) +
   ylab("Proportion of Movies that Pass") +
-##  facet_wrap(~ decade) +
+  facet_wrap(~ decade) +
   xlab("Genres")
 ```
 

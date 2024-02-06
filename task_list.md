@@ -1,6 +1,6 @@
 ## February 1
 
-1. geom_rug() plots for each genre.
+1. geom_rug() plots for each genre. 
 
 2. If time, fit logistic regression model with genre, year, (and interaction?), and make plot.
 

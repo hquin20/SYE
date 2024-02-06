@@ -20,6 +20,12 @@ movies.model <- movies.model |> mutate(binary = if_else(rating == 3, "PASS", "FA
 ```{r}
 logit_model <- glm(factor(binary) ~ genres + year, data = movies.model, family = binomial)
 summary(logit_model)
+# quadratic term for year?
+# filter out genres with low movie count
+# try different variables maybe?
+# indicator variables for genres?
+
+movies.model$genres |> table()
 ```
 
 
