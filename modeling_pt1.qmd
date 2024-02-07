@@ -13,8 +13,11 @@ library(tidyverse)
 movies.model <- read_csv("basics_movies.csv")
 movies.model <- movies.model |>separate_rows(genres, sep = ",") # movies appear multiple times for multiple genres
 movies.model <- movies.model |> mutate(binary = if_else(rating == 3, "1", "0")) |> 
-  filter(!genres %in% c("News", "Adult", "Talk-Show", "\\N"))
+  mutate(binary = as.numeric(binary)) |>
+  filter(!genres %in% c("News", "Adult", "Talk-Show", "\\N")) |>
+  relocate(binary)
 
+movies.model
 ```
 
 
@@ -35,21 +38,13 @@ movies.model$genres |> table()
 plot(logit_model)
 ```
 
+## Plot model
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r}
+ggplot(movies.model, aes(x=year, y= binary)) + 
+  geom_point(alpha=.5) + 
+  stat_smooth(method="glm", se=FALSE, method.args = list(family=binomial))
+```
 
 
 
