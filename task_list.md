@@ -1,3 +1,9 @@
+## February 22
+
+1. Fix model so that each movie is one row.
+
+2. Look at data viz section 10 to start making plot of predictions.
+
 ## February 8
 
 1. Clean up plots in genre-analysis-p2.qmd
