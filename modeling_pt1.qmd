@@ -10,7 +10,7 @@ library(tidyverse)
 ```
 
 ```{r}
-movies.model <- read_csv("basics_movies.csv")
+movies_og <- read_csv("basics_movies.csv")
 movies.model <- movies.model |>separate_rows(genres, sep = ",") # movies appear multiple times for multiple genres
 movies.model <- movies.model |> mutate(binary = if_else(rating == 3, "1", "0")) |> 
   mutate(binary = as.numeric(binary)) |>
@@ -23,7 +23,10 @@ movies.model
 
 ```{r}
 logit_model <- glm(factor(binary) ~ genres + year, data = movies.model, family = binomial)
-summary(logit_model)    # after only taking out movies with low count
+summary(logit_model)    # after only taking out movies with low count, AIC: 32893
+
+inter_model <- glm(factor(binary) ~ genres + year + genres*year, data = movies.model, family = binomial)
+summary(inter_model)  ## AIC: 32787
 
 
 # quadratic term for year?
@@ -45,6 +48,134 @@ ggplot(movies.model, aes(x=year, y= binary)) +
   geom_point(alpha=.5) + 
   stat_smooth(method="glm", se=FALSE, method.args = list(family=binomial))
 ```
+
+-------------------------------------------------------------------------------------------------------------------
+
+
+## need to create indicator variables for each genre i think and pivot wider --> need to have 0s and 1s for each category so each movie has one row.  movies can have 1s in multiple genres
+
+```{r}
+movies_indi <- 
+  movies_og |> 
+  filter(!genres %in% c("News", "Adult", "Talk-Show", "\\N")) |>
+  separate_rows(genres, sep = ",") |>
+  pivot_wider(names_from = genres, values_from = title) |>
+  mutate(across(c("Documentary", "Animation", "Sport", "Short", "Action", "Comedy", "Romance", "NA",
+                  "Western", "Music", "History", "Horror", "Family", "Fantasy", 
+                  "Drama", "Crime", "Adventure", "Biography", "Mystery", "Sci-Fi", "War", 
+                  "Thriller", "Musical", "Film-Noir", "Adult"), 
+                ~if_else(is.na(.), 0, 1)))
+
+movies_indi <- movies_indi |> 
+  mutate(binary = if_else(rating == 3, "1", "0")) |> 
+  mutate(binary = as.numeric(binary))
+```
+
+### Look into Section 10 from data viz class
+
+Create model
+
+```{r}
+library(broom)
+```
+
+
+```{r}
+mod2 <- glm(factor(binary) ~ year + Animation + Action + Adult + Adventure  
+         #    + Biography + Comedy + Crime + Documentary + Drama + Family + 
+        #      Fantasy + History + Horror + Music + Musical + Mystery + Romance + 
+         #     Short + Sport + Thriller + War + Western, 
+            ,family = "binomial", data = movies_indi)
+
+mod2 |> tidy()
+```
+
+
+## Plotting the model 
+
+### Creating grid of predictor values
+```{r}
+library(modelr)
+grid <- movies_indi |>
+  data_grid(
+    year = seq_range(year, n = 6),
+    binary = c(0, 1),
+    Action = c(0, 1),
+    Adult = c(0, 1),
+    Adventure = c(0, 1),
+    Animation = c(0, 1)
+  ) 
+
+grid
+```
+
+```{r}
+aug_movies <- augment(mod2, newdata = grid, se_fit = TRUE)
+aug_movies
+```
+
+```{r}
+aug_movies <- aug_movies |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted))) ## change odds to probabilities
+```
+
+```{r}
+ggplot(aug_movies, aes(x = year, y = .pi)) +
+#  geom_point(data = movies_indi, aes(x = year, y = binary)) +
+  geom_smooth(method = "glm") +
+  theme_minimal()
+```
+
+
+### Comparing models with only Action and only Comedy
+
+```{r}
+movies_indi <- movies_indi |> mutate(binary = as.factor(binary))
+mod_action <- glm(binary ~ year + Action + year*Action, 
+                  family = "binomial", data = movies_indi)   # AIC shows better with interaction included
+
+mod_comedy <- glm(binary ~ year + Comedy + year*Comedy, 
+                  family = "binomial", data = movies_indi) 
+```
+
+
+Combine fitted values from both models into one data set
+```{r}
+grid_action <- movies_indi |>
+  data_grid(
+    year = seq_range(year, n = 6),
+    binary = c(0, 1),
+    Action = c(0, 1)
+  ) 
+
+grid_comedy <- movies_indi |>
+  data_grid(
+    year = seq_range(year, n = 6),
+    binary = c(0, 1),
+    Comedy = c(0, 1)
+  ) 
+
+aug_action <- augment(mod_action, newdata = grid_action, se_fit = TRUE)
+aug_comedy <- augment(mod_comedy, newdata = grid_comedy, se_fit = TRUE)
+
+plot_df <- bind_rows(lst(aug_action, aug_comedy), .id = "model")
+plot_df
+```
+
+```{r}
+plot_df <- plot_df |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))  # change odds to probabilities
+```
+
+
+```{r}
+ggplot(plot_df, aes(x = year, y = .pi)) +
+  geom_smooth(method = "glm", aes(color = model)) +
+  theme_minimal()
+```
+
+
+
+
+
 
 
 
