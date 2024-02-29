@@ -71,6 +71,17 @@ movies_indi <- movies_indi |>
   mutate(binary = as.numeric(binary))
 ```
 
+#create new data set where each movie has just one genre --> filter out these years in the grid
+
+this will allow for augmenting with all of the genres in the set
+
+create data set with one column for genre so we can plot the models but facet by the genre
+
+create model with all movie genres
+
+look into interactions between genres (do you think the combination of certain movies will affect the likelihood of passing the test?)
+
+
 ### Look into Section 10 from data viz class
 
 Create model
@@ -82,9 +93,9 @@ library(broom)
 
 ```{r}
 mod2 <- glm(factor(binary) ~ year + Animation + Action + Adult + Adventure  
-         #    + Biography + Comedy + Crime + Documentary + Drama + Family + 
-        #      Fantasy + History + Horror + Music + Musical + Mystery + Romance + 
-         #     Short + Sport + Thriller + War + Western, 
+             + Biography + Comedy + Crime + Documentary + Drama + Family + 
+              Fantasy + History + Horror + Music + Musical + Mystery + Romance + 
+              Short + Sport + Thriller + War + Western, 
             ,family = "binomial", data = movies_indi)
 
 mod2 |> tidy()
@@ -166,11 +177,61 @@ plot_df <- plot_df |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))  # change 
 ```
 
 
-```{r}
+```{r message = F}
 ggplot(plot_df, aes(x = year, y = .pi)) +
   geom_smooth(method = "glm", aes(color = model)) +
   theme_minimal()
 ```
+
+Notes from 2/22 (that i can remember) 
+
+- use pivot longer to create genres column with names
+
+- use data set to create faceted line plots for each genre
+
+- create model with all genres -> try to plot?
+
+
+```{r}
+genre_plot <- movies_indi |> pivot_longer(c(Animation, Action, Adult, Adventure, Biography, Comedy, 
+                  Crime, Documentary, Drama, Family, Fantasy, History, 
+                  Horror, Music, Musical, Mystery, Romance, Short, 
+                  Sport, Thriller, War, Western)) |>
+  rename("genre" = "name") |>
+  select(-`NA`, -`Sci-Fi`, -`Film-Noir`, -News, `Talk-Show`)
+
+genre_plot
+```
+
+
+```{r}
+grid <- genre_plot |>
+  data_grid(
+    year = seq_range(year, n = 6),
+    binary = c(0, 1),
+    genre = c("Animation", "Action", "Adult", "Adventure", "Biography", "Comedy", 
+                  "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", 
+                  "Horror", "Music", "Musical", "Mystery", "Romance", "Short", 
+                  "Sport", "Thriller", "War", "Western"))
+
+genre_model <- glm(binary ~ year + genre, data = genre_plot, family = "binomial")
+genre_model |> tidy()
+
+aug_genre_model <- augment(genre_model, newdata = grid, se_fit = TRUE)  ## cannot match these up because predictors                                                                         and variables are different - but I cannot                                                                          create grid with all genres separately
+aug_genre_model
+```
+
+
+```{r}
+ggplot(data = aug_genre_model, aes(x = year, y = .fitted)) +
+  geom_line() +
+  facet_wrap(~ genre)   
+```
+
+
+
+
+
 
 
 
