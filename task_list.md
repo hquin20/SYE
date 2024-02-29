@@ -1,3 +1,15 @@
+## March 7
+
+1. Make sum variable on grid and filter to keep only rows where sum is 1. Then augment().
+
+2. pivot_longer() the augmented data frame to make plots, using genre as an aesthetic or as a facet.
+
+3. If goes well, add an interaction between year and each of the genre variables in the model and plot and compare plots and compare BIC.
+
+4. Examine posterdown link: <https://github.com/brentthorne/posterdown>.
+
+5. Next week, talk more about the write-up.
+
 ## February 22
 
 1. Fix model so that each movie is one row.
