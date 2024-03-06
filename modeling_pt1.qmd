@@ -71,7 +71,7 @@ movies_indi <- movies_indi |>
   mutate(binary = as.numeric(binary))
 ```
 
-#create new data set where each movie has just one genre --> filter out these years in the grid
+# create new data set where each movie has just one genre --> filter out these years in the grid
 
 this will allow for augmenting with all of the genres in the set
 
@@ -96,7 +96,7 @@ mod2 <- glm(factor(binary) ~ year + Animation + Action + Adult + Adventure
              + Biography + Comedy + Crime + Documentary + Drama + Family + 
               Fantasy + History + Horror + Music + Musical + Mystery + Romance + 
               Short + Sport + Thriller + War + Western, 
-            ,family = "binomial", data = movies_indi)
+            family = "binomial", data = movies_indi)
 
 mod2 |> tidy()
 ```
@@ -118,6 +118,11 @@ grid <- movies_indi |>
   ) 
 
 grid
+
+# create grid with all genres
+# mutate sum variable with all genres
+# filter out sum greater than 1 or if the sum is 0 
+# delete new sum variable 
 ```
 
 ```{r}
@@ -229,11 +234,116 @@ ggplot(data = aug_genre_model, aes(x = year, y = .fitted)) +
 ```
 
 
+- Make separate plot for each genre after augmenting with model 
+
+- pivot after augment .fitted values (if not working make separate plots)
 
 
+### Creating grid of predictor values
+
+```{r}
+library(modelr)
+grid1 <- movies_indi |>
+  data_grid(
+    year = seq_range(year, n = 6),
+    binary = c(0, 1),
+    Animation = c(0, 1),
+    Action = c(0, 1),
+    Adult = c(0, 1),
+    Adventure = c(0, 1),
+    Biography = c(0, 1),
+    Comedy = c(0, 1),
+    Crime = c(0, 1),
+    Documentary = c(0, 1),
+    Drama = c(0, 1),
+    Family = c(0, 1),
+    Fantasy = c(0, 1),
+    History = c(0, 1),
+    Horror = c(0, 1),
+    Music = c(0, 1),
+    Musical = c(0, 1),
+    Mystery = c(0, 1),
+    Romance = c(0, 1),
+    Short = c(0, 1),
+    Sport = c(0, 1),
+    Thriller = c(0, 1),
+    War = c(0, 1),
+    Western = c(0, 1)
+  )
 
 
+new_grid <- grid1 |> mutate(sum = Animation + Action + Adult + Adventure  
+             + Biography + Comedy + Crime + Documentary + Drama + Family + 
+              Fantasy + History + Horror + Music + Musical + Mystery + Romance + 
+              Short + Sport + Thriller + War + Western) |>
+  filter(sum == 1) |> 
+  select(-sum)
 
+new_grid
+
+# create grid with all genres 
+# mutate sum variable with all genres 
+# filter out sum greater than 1 or if the sum is 0 
+# delete new sum variable 
+```
+
+```{r}
+aug_mod2 <- augment(mod2, newdata = new_grid, se_fit = TRUE)
+
+aug_mod2 <- aug_mod2 |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
+```
+
+
+```{r}
+list2 <- aug_mod2 |> pivot_longer(cols = c(Animation, Action, Adult, Adventure, Biography, Comedy, 
+    Crime, Documentary, Drama, Family, Fantasy, History, 
+    Horror, Music, Musical, Mystery, Romance, Short, 
+    Sport, Thriller, War, Western), names_to = "genre", values_to = "values")
+```
+
+
+```{r}
+list2 |> filter(values == 1) |> 
+  ggplot(aes(x = year, y = .pi)) +
+  geom_line(linewidth = 0.8) +
+  facet_wrap(~ genre)
+```
+
+```{r}
+mod3 <- glm(factor(binary) ~ year + Animation + Action + Adult + Adventure +
+                     Biography + Comedy + Crime + Documentary + Drama +
+                     Family + Fantasy + History + Horror + Music +
+                     Musical + Mystery + Romance + Short + Sport +
+                     Thriller + War + Western +
+                     year:Animation + year:Action + year:Adult + year:Adventure +
+                     year:Biography + year:Comedy + year:Crime + year:Documentary + year:Drama +
+                     year:Family + year:Fantasy + year:History + year:Horror + year:Music +
+                     year:Musical + year:Mystery + year:Romance + year:Short + year:Sport +
+                     year:Thriller + year:War + year:Western, 
+            family = "binomial", data = movies_indi)
+
+mod3 |> glance()  ## AIC is 12935, BIC is 13267.67	
+mod2 |> glance()  ## AIC is 12988, BIC is 13161.92
+```
+
+```{r}
+aug_mod3 <- augment(mod3, newdata = new_grid, se_fit = TRUE)
+
+aug_mod3 <- aug_mod3 |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
+
+list3 <- aug_mod3 |> pivot_longer(cols = c(Animation, Action, Adult, Adventure, Biography, Comedy, 
+    Crime, Documentary, Drama, Family, Fantasy, History, 
+    Horror, Music, Musical, Mystery, Romance, Short, 
+    Sport, Thriller, War, Western), names_to = "genre", values_to = "values")
+```
+
+
+```{r}
+list3 |> filter(values == 1) |> 
+  ggplot(aes(x = year, y = .pi)) +
+  geom_line(linewidth = 0.8) +
+  facet_wrap(~ genre)
+```
 
 
 
