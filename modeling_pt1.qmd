@@ -345,7 +345,17 @@ list3 |> filter(values == 1) |>
   facet_wrap(~ genre)
 ```
 
+```{r}
+list2 |> filter(values == 1) |> 
+  ggplot(aes(x = year, y = .pi)) +
+  geom_line(aes(color = genre), linewidth = 0.8) 
+```
 
+```{r}
+list3 |> filter(values == 1) |> 
+  ggplot(aes(x = year, y = .pi)) +
+  geom_line(aes(color = genre), linewidth = 0.8) 
+```
 
 
 
