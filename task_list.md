@@ -1,3 +1,11 @@
+## March 14
+
+1. Put rug marks on faceted graph (and on the coloured one too).
+
+2. Clean up graphs and make them look "nice".
+
+3. Go back to the other data set and pick another question to answer (some ideas: male/female director, awards, budget and gross income).
+
 ## March 7
 
 1. Make sum variable on grid and filter to keep only rows where sum is 1. Then augment().
