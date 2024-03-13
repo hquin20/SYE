@@ -296,9 +296,14 @@ aug_mod2 <- aug_mod2 |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
 
 ```{r}
 list2 <- aug_mod2 |> pivot_longer(cols = c(Animation, Action, Adult, Adventure, Biography, Comedy, 
-    Crime, Documentary, Drama, Family, Fantasy, History, 
-    Horror, Music, Musical, Mystery, Romance, Short, 
-    Sport, Thriller, War, Western), names_to = "genre", values_to = "values")
+                                           Crime, Documentary, Drama, Family, Fantasy, History, 
+                                           Horror, Music, Musical, Mystery, Romance, Short, 
+                                           Sport, Thriller, War, Western), names_to = "genre", values_to = "values")
+```
+
+```{r}
+movies_pass <- movies_indi |> filter(binary == 1)
+movies_fail <- movies_indi |> filter(binary == 0)
 ```
 
 
@@ -306,20 +311,21 @@ list2 <- aug_mod2 |> pivot_longer(cols = c(Animation, Action, Adult, Adventure, 
 list2 |> filter(values == 1) |> 
   ggplot(aes(x = year, y = .pi)) +
   geom_line(linewidth = 0.8) +
+  ## geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") + 
   facet_wrap(~ genre)
 ```
 
 ```{r}
 mod3 <- glm(factor(binary) ~ year + Animation + Action + Adult + Adventure +
-                     Biography + Comedy + Crime + Documentary + Drama +
-                     Family + Fantasy + History + Horror + Music +
-                     Musical + Mystery + Romance + Short + Sport +
-                     Thriller + War + Western +
-                     year:Animation + year:Action + year:Adult + year:Adventure +
-                     year:Biography + year:Comedy + year:Crime + year:Documentary + year:Drama +
-                     year:Family + year:Fantasy + year:History + year:Horror + year:Music +
-                     year:Musical + year:Mystery + year:Romance + year:Short + year:Sport +
-                     year:Thriller + year:War + year:Western, 
+              Biography + Comedy + Crime + Documentary + Drama +
+              Family + Fantasy + History + Horror + Music +
+              Musical + Mystery + Romance + Short + Sport +
+              Thriller + War + Western +
+              year:Animation + year:Action + year:Adult + year:Adventure +
+              year:Biography + year:Comedy + year:Crime + year:Documentary + year:Drama +
+              year:Family + year:Fantasy + year:History + year:Horror + year:Music +
+              year:Musical + year:Mystery + year:Romance + year:Short + year:Sport +
+              year:Thriller + year:War + year:Western, 
             family = "binomial", data = movies_indi)
 
 mod3 |> glance()  ## AIC is 12935, BIC is 13267.67	
@@ -332,31 +338,60 @@ aug_mod3 <- augment(mod3, newdata = new_grid, se_fit = TRUE)
 aug_mod3 <- aug_mod3 |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
 
 list3 <- aug_mod3 |> pivot_longer(cols = c(Animation, Action, Adult, Adventure, Biography, Comedy, 
-    Crime, Documentary, Drama, Family, Fantasy, History, 
-    Horror, Music, Musical, Mystery, Romance, Short, 
-    Sport, Thriller, War, Western), names_to = "genre", values_to = "values")
+                                           Crime, Documentary, Drama, Family, Fantasy, History, 
+                                           Horror, Music, Musical, Mystery, Romance, Short, 
+                                           Sport, Thriller, War, Western), names_to = "genre", values_to = "values")
 ```
 
 
 ```{r}
 list3 |> filter(values == 1) |> 
   ggplot(aes(x = year, y = .pi)) +
+  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +
+  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") + 
   geom_line(linewidth = 0.8) +
   facet_wrap(~ genre)
 ```
 
 ```{r}
-list2 |> filter(values == 1) |> 
-  ggplot(aes(x = year, y = .pi)) +
-  geom_line(aes(color = genre), linewidth = 0.8) 
+list2 |> filter(values == 1, genre != "Adult") |> 
+  ggplot(aes(x = year, y = .pi)) + 
+  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +  ## why is this changing the axis
+  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") + 
+  geom_line(aes(color = genre), linewidth = 0.8) +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) +
+  theme_minimal()
+ 
 ```
 
 ```{r}
-list3 |> filter(values == 1) |> 
-  ggplot(aes(x = year, y = .pi)) +
-  geom_line(aes(color = genre), linewidth = 0.8) 
+## pick ~ 6 genres for this plot
+## clean up plot
+
+list3 |> filter(values == 1, genre != "Adult") |> 
+  ggplot(aes(x = year, y = .pi)) + 
+  geom_line(aes(color = genre), linewidth = 0.8) + 
+  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +  ## why is this changing the axis
+  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") + 
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) + 
+  theme_minimal() +
+  labs(x = "Year", y = "Probabilty of Passing\n", color = "Genre")
 ```
 
+```{r}
+list3 |> filter(values == 1, genre %in% c("Sport", "Comedy", "Romance", "Action", "Documentary", "War", "Western")) |> 
+  ggplot(aes(x = year, y = .pi)) +                      # need to pick which genres to keep in visual
+  geom_line(aes(color = genre), linewidth = 0.8) + 
+  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +
+  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") + 
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) + 
+  theme_minimal() +
+  labs(x = "\nYear",
+       y = "Probabilty of Passing\n", 
+       color = "Genre",
+       title = "Different Genres Passing the Bechdel Test Over Time") +
+  scale_color_viridis_d()
+```
 
 
 
