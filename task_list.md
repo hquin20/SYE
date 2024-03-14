@@ -1,3 +1,19 @@
+## March 28
+
+MH: look at awards.
+
+1. Put any data cleaning / joining / prep work into a data_cleaning.R file. At the end, use write_csv(here::here("data/name_of_file.csv")) and put the clean data sets into a /data folder.
+
+    * anything old that is not being used can either be deleted or put in its own folder.
+    
+2. Clean up graphs (especially the genre analysis graphs).
+
+3. Start the poster <https://github.com/brentthorne/posterdown>.
+
+    1. introduce the data sets in bullet points (number of movies, variables of interest, etc.)
+    
+    1. introduce the Bechdel test itself in bullet points.
+
 ## March 14
 
 1. Put rug marks on faceted graph (and on the coloured one too).
