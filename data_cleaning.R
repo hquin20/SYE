@@ -68,7 +68,7 @@ movies_genre <- movies2 %>% unnest_tokens(output = "genre", input = "genre")
 
 ## Genre Analysis pt. 2
 
-test_df <- read_tsv(here::here("data.tsv")) |>    # this line takes very long time to load
+test_df <- read_tsv(here::here("data.tsv")) |>    # not sure where I got this from 
   mutate(imdbid = parse_number(tconst))
 movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE)%>%
   tibble::tibble()%>%
@@ -79,9 +79,59 @@ basics.movies <- left_join(movies_api, test_df,
                            by = "imdbid")
 sum(is.na(basics.movies$genres)) ## only 8 missing!!
 
-write_csv(basics.movies, here::here("data/basics.movies.csv"))
 
-## this one doesnt work yet
+basics.movies <- basics.movies |>separate_rows(genres, sep = ",") # movies appear multiple times for multiple genres
+basics.movies <- basics.movies |> mutate(binary = if_else(rating == 3, "PASS", "FAIL"))
+
+
+write_csv(basics.movies, here::here("data/movies_genre.csv"))  ## this will not work yet
+
+
+
+## Modeling pt. 1
+
+movies_og <- read_csv("basics_movies.csv")
+movies.model <- movies.model |>separate_rows(genres, sep = ",") # movies appear multiple times for multiple genres
+movies.model <- movies.model |> mutate(binary = if_else(rating == 3, "1", "0")) |> 
+  mutate(binary = as.numeric(binary)) |>
+  filter(!genres %in% c("News", "Adult", "Talk-Show", "\\N")) |>
+  relocate(binary)
+
+movies_indi <- 
+  movies_og |> 
+  filter(!genres %in% c("News", "Adult", "Talk-Show", "\\N")) |>
+  separate_rows(genres, sep = ",") |>
+  pivot_wider(names_from = genres, values_from = title) |>
+  mutate(across(c("Documentary", "Animation", "Sport", "Short", "Action", "Comedy", "Romance", "NA",
+                  "Western", "Music", "History", "Horror", "Family", "Fantasy", 
+                  "Drama", "Crime", "Adventure", "Biography", "Mystery", "Sci-Fi", "War", 
+                  "Thriller", "Musical", "Film-Noir", "Adult"), 
+                ~if_else(is.na(.), 0, 1)))
+
+movies_indi <- movies_indi |> 
+  mutate(binary = if_else(rating == 3, "1", "0")) |> 
+  mutate(binary = as.numeric(binary)) |> mutate(binary = as.factor(binary))
+
+write_csv(movies_indi, here::here("data/movies_indicator.csv"))
+
+
+
+## API Data Set 
+
+library(awtools)
+library(jsonlite)
+library(ggplot2movies)
+
+ggplotmovies <- ggplot2movies::movies
+
+movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE)%>%
+  data.frame()%>%
+  mutate(year=as.numeric(year),
+         id=as.numeric(id))
+
+write_csv(movies_api, here::here("data/movies_api.csv"))
+
+
 
 
 
