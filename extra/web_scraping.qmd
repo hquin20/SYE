@@ -4,20 +4,16 @@ format: html
 editor: visual
 ---
 
-
 ```{r}
 library(tidyverse)
 library(rvest)
 ```
-
-
 
 ```{r}
 url <- 'https://www.imdb.com/search/title/?title_type=feature&release_date=2019-01-01,2019-12-31&count=100'
 
 webpage <- read_html(url)
 ```
-
 
 ```{r}
 #Using CSS selectors to scrape the rankings section
@@ -32,7 +28,6 @@ rank_data <- html_text(rank_data_html)
 head(rank_data)
 ```
 
-
 ```{r}
 #Data-Preprocessing: Converting rankings to numerical
 rank_data<-as.numeric(rank_data)
@@ -40,5 +35,3 @@ rank_data<-as.numeric(rank_data)
 #Let's have another look at the rankings
 head(rank_data)
 ```
-
-

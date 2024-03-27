@@ -37,10 +37,6 @@ movies.model$genres |> table()
 ```
 
 
-```{r}
-plot(logit_model)
-```
-
 ## Plot model
 
 ```{r}
@@ -52,23 +48,13 @@ ggplot(movies.model, aes(x=year, y= binary)) +
 -------------------------------------------------------------------------------------------------------------------
 
 
-## need to create indicator variables for each genre i think and pivot wider --> need to have 0s and 1s for each category so each movie has one row.  movies can have 1s in multiple genres
 
-```{r}
-movies_indi <- 
-  movies_og |> 
-  filter(!genres %in% c("News", "Adult", "Talk-Show", "\\N")) |>
-  separate_rows(genres, sep = ",") |>
-  pivot_wider(names_from = genres, values_from = title) |>
-  mutate(across(c("Documentary", "Animation", "Sport", "Short", "Action", "Comedy", "Romance", "NA",
-                  "Western", "Music", "History", "Horror", "Family", "Fantasy", 
-                  "Drama", "Crime", "Adventure", "Biography", "Mystery", "Sci-Fi", "War", 
-                  "Thriller", "Musical", "Film-Noir", "Adult"), 
-                ~if_else(is.na(.), 0, 1)))
 
-movies_indi <- movies_indi |> 
-  mutate(binary = if_else(rating == 3, "1", "0")) |> 
-  mutate(binary = as.numeric(binary))
+```{r warning = F, message = F}
+## create indicator variables for each genre and pivot wider --> need to have 0s and 1s for each category so each movie has one row.  movies can have 1s in multiple genres
+
+movies_indi <- read_csv("data/movies_indicator.csv")
+movies_indi |> head()
 ```
 
 # create new data set where each movie has just one genre --> filter out these years in the grid

@@ -5,11 +5,11 @@ library(rvest)
 
 library(tidyverse)
 
-test_df <- read_tsv(here::here("title.basics.tsv")) |>
+test_df <- read_tsv(here::here("title.basics.tsv")) |>   ## not sure where this data set is from 
   mutate(imdbid = parse_number(tconst))
 
-movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE)%>%
- tibble::tibble()%>%
+movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE) %>%
+ tibble::tibble() %>%
   mutate(year=as.numeric(year),
         id=as.numeric(id),
         imdbid = as.numeric(imdbid))

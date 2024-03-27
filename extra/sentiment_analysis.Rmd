@@ -23,9 +23,8 @@ nrc <- get_sentiments("nrc")
 ```
 
 ```{r message=FALSE, warning=FALSE}
-# read in the data manually
-raw_bechdel <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/raw_bechdel.csv')
-movies <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/movies.csv')
+raw_bechdel <- read_csv("data/raw_bechdel.csv")
+movies <- read_csv("data/movies_raw.csv")
 ```
 
 Create data set where each row is a word and there is a column for each word's sentiment (positive/negative or fear/anger/joy/etc.).

@@ -28,7 +28,7 @@ basics.movies$genres
 
 
 ```{r message = F, warning=FALSE}
-basics.movies <- read_csv("basics_movies.csv")
+basics.movies <- read_csv("data/basics_movies.csv")
 head(basics.movies)
 ```
 

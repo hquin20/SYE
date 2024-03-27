@@ -4,20 +4,19 @@ format: html
 editor: visual
 ---
 
-```{r}
+```{r message = F}
 library(tidyverse)
 library(broom)
-movies2 <- read.csv("C:/Users/Hailey/OneDrive - St. Lawrence University/SYE/SYE/movies2.csv")
+movies2 <- read_csv("data/movies_sentiment.csv")
 movies2
 ```
-
 
 ```{r}
 movies2 <- movies2 %>% mutate(binary_0 = ifelse(binary == "PASS", 1, 0))
 
 mod_year <- glm(binary_0 ~ budget_2013 +
                   year + 
-                  imdb_rating,
+                  imdb_rating + metascore,
                 data = movies2, family = "binomial") 
 summary(mod_year) 
 ```
@@ -42,13 +41,3 @@ ggplot(data = aug_year, aes(x = budget_2013, y = .pi)) +
   facet_wrap(~ year) +
   labs(y = "Probability of Passing Test")
 ```
-
-
-
-
-
-
-
-
-
-

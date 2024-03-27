@@ -7,7 +7,7 @@ editor: visual
 ```{r}
 library(tidyverse)
 library(broom)
-movies2 <- read.csv("movies2.csv")
+movies2 <- read_csv("data/movies_sentiment.csv")
 movies2 |> as_tibble() 
 ```
 

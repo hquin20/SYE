@@ -8,12 +8,12 @@ editor: visual
 library(tidyverse)
 library(tidytext)
 library(textdata)
+library(here)
 ```
 
 ```{r message=FALSE, warning=FALSE}
-# read in the data manually
-raw_bechdel <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/raw_bechdel.csv')
-movies <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/movies.csv')
+raw_bechdel <- read_csv("data/raw_bechdel.csv")
+movies <- read_csv("data/movies_raw.csv")
 
 afinn <- get_sentiments("afinn")
 bing <- get_sentiments("bing")
@@ -23,11 +23,13 @@ nrc <- get_sentiments("nrc")
 tasks: look into genre- accounting for genre, difference in positivity scores? (facet) separate line for every genre (movies have multiple lines) - similar to plot method
 
 ```{r}
-movies2 <- read.csv("C:/Users/Hailey/OneDrive - St. Lawrence University/SYE/SYE/movies2.csv")
+movies2 <- read.csv(here::here("data/movies_sentiment.csv"))
 ```
 
 ```{r}
-movies_genre <- movies2 %>% unnest_tokens(output = "genre", input = "genre")
+movies_genre <- movies2 %>% unnest_tokens(output = "genre", input = "genre") 
+## i don't like this data set
+## one row for every genre, sometimes can be wrong
 ```
 
 ```{r}
@@ -142,23 +144,12 @@ movies_genre %>% filter(genre == "drama") %>%
 
 investigate genre and sentiment analysis with api data set next\*\*
 
+1.  genre with new data set
 
+-   separate genre so each movie appears more than once (since movies have multiple genres)
 
+2.  time
 
+3.  interactions - maybe small interaction time and movies passing within genre
 
-
-1. genre with new data set
-
- - separate genre so each movie appears more than once (since movies have multiple genres)
- 
-2. time 
-
-3. interactions - maybe small interaction time and movies passing within genre
-
-
-- possible fit model after this is done (more of a future task)
-
-
-
-
-
+-   possible fit model after this is done (more of a future task)

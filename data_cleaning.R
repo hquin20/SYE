@@ -1,11 +1,15 @@
 library(tidyverse)
 
-## Exploratory Analysis
-
 raw_bechdel <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/raw_bechdel.csv')
 movies <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/movies.csv')
 
-movies <- movies %>% mutate(binary_test = if_else(binary == "PASS", 1, 0))
+write_csv(raw_bechdel, here::here("data/raw_bechdel.csv"))
+write_csv(movies, here::here("data/movies_raw.csv"))
+
+
+## Exploratory Analysis
+
+movies_raw <- movies %>% mutate(binary_test = if_else(binary == "PASS", 1, 0))
 movies$plot <- str_to_lower(movies$plot)
 movies_women <- movies %>% mutate(women = str_detect(plot, " woman | women | she | her | girl "))
 
@@ -65,6 +69,7 @@ write_csv(movies2, here::here("data/movies_sentiment.csv"))
 ## Genre Analysis pt. 1
 
 movies_genre <- movies2 %>% unnest_tokens(output = "genre", input = "genre")
+
 
 ## Genre Analysis pt. 2
 
