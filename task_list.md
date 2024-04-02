@@ -1,3 +1,20 @@
+## April 4
+
+1. Left-panel of poster with background and data introduction (maybe do write-up at same time / outline of write-up at some time).
+
+2. Make two plots look "nicer".
+
+3. Look into layout and options of poster.
+
+    * https://github.com/kaseygwood/slufellow/tree/main/fellow_poster
+    * https://github.com/lilykasperek/Fellowship2023/tree/main/Fellowship_Poster
+
+## Dates
+
+April 11: Abstract Submission (will do at meeting)
+
+April 21: Poster Printing Deadline
+
 ## March 28
 
 MH: look at awards.
