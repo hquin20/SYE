@@ -1,3 +1,9 @@
+## April 11
+
+1. Making the graph for the "extra analysis part."
+
+2. Left-panel of poster done and then plots in the other two panels there (but not formatted).
+
 ## April 4
 
 1. Left-panel of poster with background and data introduction (maybe do write-up at same time / outline of write-up at some time).
