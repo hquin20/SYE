@@ -59,8 +59,8 @@ library(modelr)
 grid <- movies2 |>
   data_grid(
     year = median(movies2$year, na.rm = TRUE),
-    profit = median(movies2$profit, na.rm = TRUE),
-    imdb_rating = seq_range(imdb_rating, n = 20),
+    profit = median(movies2$profit, na.rm = TRUE),  ## look into this more 
+    imdb_rating = seq_range(imdb_rating, n = 20),   ## choose which variables to fix at the median and show in the plot
     metascore = seq_range(metascore, n = 4)
     )
 

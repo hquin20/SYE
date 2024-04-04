@@ -9,8 +9,8 @@ format: html
 library(tidyverse)
 ```
 
-```{r}
-movies_og <- read_csv("basics_movies.csv")
+```{r message = F}
+movies_og <- read_csv("data/basics_movies.csv")
 movies.model <- movies.model |>separate_rows(genres, sep = ",") # movies appear multiple times for multiple genres
 movies.model <- movies.model |> mutate(binary = if_else(rating == 3, "1", "0")) |> 
   mutate(binary = as.numeric(binary)) |>
@@ -111,7 +111,7 @@ grid
 # delete new sum variable 
 ```
 
-```{r}
+```
 aug_movies <- augment(mod2, newdata = grid, se_fit = TRUE)
 aug_movies
 ```
@@ -366,17 +366,18 @@ list3 |> filter(values == 1, genre != "Adult") |>
 
 ```{r}
 list3 |> filter(values == 1, genre %in% c("Sport", "Comedy", "Romance", "Action", "Documentary", "War", "Western")) |> 
+  mutate(genre = fct_reorder2(genre, .x = year, .y = .pi)) |>
   ggplot(aes(x = year, y = .pi)) +                      # need to pick which genres to keep in visual
   geom_line(aes(color = genre), linewidth = 0.8) + 
-  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +
-  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") + 
+  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +  ## alpha = 0.4
+  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") +  
   scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) + 
   theme_minimal() +
   labs(x = "\nYear",
        y = "Probabilty of Passing\n", 
        color = "Genre",
        title = "Different Genres Passing the Bechdel Test Over Time") +
-  scale_color_viridis_d()
+  scale_color_viridis_d()  ## make font and lines bigger for poster
 ```
 
 

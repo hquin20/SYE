@@ -1,0 +1,155 @@
+---
+title: Predicting the Bechdel Test through Statistical Modeling 
+author:
+  - name: Hailey Quintavalle
+affiliation:
+  - address: Department of Math, Computer Science, and Statistics, St. Lawrence University 
+  - adress: Advisor - Matt Higham
+column_numbers: 3
+logoright_name: https&#58;//raw.githubusercontent.com/brentthorne/posterdown/master/images/betterhexlogo.png
+logoleft_name: https&#58;//raw.githubusercontent.com/brentthorne/posterdown/master/images/betterhexlogo.png
+output: 
+  posterdown::posterdown_html:
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Abstract
+
+**Goal**: Investigate which aspects of a movie make it more likely to pass the Bechdel Test
+
+  Enter fuller abstract here. 
+
+
+
+
+
+
+
+
+
+
+# Background
+
+## What is the **Bechdel Test**?
+
+- Created by Alison Bechdel in 1986
+- Originally a comic strip 
+- Used to assess the presence of women in movies
+
+To pass, movie must pass 3 tests:
+
+1. At least **2** named female characters
+2. Women must talk to each other
+3. Conversation about something *other than a man*
+
+**Flaws** of the Bechdel Test
+
+- Too simple requirements
+  - *Only takes one line to pass*
+- Does not take into account ...
+
+
+
+
+
+
+
+# Data
+
+- Took IMDb movie data and combined it with api data --> find source of api data
+
+```{r mytable, out.width='80%'}
+knitr::kable(iris[1:10, 1:4], caption = 'Table caption.',align = 'c',"html")
+```
+
+
+
+
+
+
+
+
+
+
+# Primary Model 
+
+$logit(pi) = Beta_0 + Beta_1X_1 + ...)$  <-- type part of the final model here
+
+```{r eval = F}
+library(tidyverse)
+movies_indi <- read_csv("data/movies_indicator.csv")
+
+grid1 <- read_csv("data/movies_grid1.csv")
+library(modelr)
+
+new_grid <- grid1 |> mutate(sum = Animation + Action + Adult + Adventure  
+             + Biography + Comedy + Crime + Documentary + Drama + Family + 
+              Fantasy + History + Horror + Music + Musical + Mystery + Romance + 
+              Short + Sport + Thriller + War + Western) |>
+  filter(sum == 1) |> 
+  select(-sum)
+mod3 <- glm(factor(binary) ~ year + Animation + Action + Adult + Adventure +
+              Biography + Comedy + Crime + Documentary + Drama +
+              Family + Fantasy + History + Horror + Music +
+              Musical + Mystery + Romance + Short + Sport +
+              Thriller + War + Western +
+              year:Animation + year:Action + year:Adult + year:Adventure +
+              year:Biography + year:Comedy + year:Crime + year:Documentary + year:Drama +
+              year:Family + year:Fantasy + year:History + year:Horror + year:Music +
+              year:Musical + year:Mystery + year:Romance + year:Short + year:Sport +
+              year:Thriller + year:War + year:Western, 
+            family = "binomial", data = movies_indi)
+
+aug_mod3 <- augment(mod3, newdata = new_grid, se_fit = TRUE)
+
+aug_mod3 <- aug_mod3 |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
+
+list3 <- aug_mod3 |> pivot_longer(cols = c(Animation, Action, Adult, Adventure, Biography, Comedy, 
+                                           Crime, Documentary, Drama, Family, Fantasy, History, 
+                                           Horror, Music, Musical, Mystery, Romance, Short, 
+                                           Sport, Thriller, War, Western), names_to = "genre", 
+                                  values_to = "values")
+```
+
+```{r eval = F}
+list3 |> filter(values == 1, genre %in% c("Sport", "Comedy", "Romance", "Action", "Documentary", "War", "Western")) |> 
+  mutate(genre = fct_reorder2(genre, .x = year, .y = .pi)) |>
+  ggplot(aes(x = year, y = .pi)) +                      # need to pick which genres to keep in visual
+  geom_line(aes(color = genre), linewidth = 0.8) + 
+  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +  ## alpha = 0.4
+  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") +  
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) + 
+  theme_minimal() +
+  labs(x = "\nYear",
+       y = "Probabilty of Passing\n", 
+       color = "Genre",
+       title = "Different Genres Passing the Bechdel Test Over Time") +
+  scale_color_viridis_d()  ## make font and lines bigger for poster
+```
+
+
+
+
+
+
+
+
+
+
+# Further Analysis
+
+Aliquam sed faucibus risus, quis efficitur erat. Vestibulum semper mauris quis tempus eleifend. Aliquam sagittis dictum ipsum, quis viverra ligula eleifend ut. Curabitur sagittis vitae arcu eget faucibus. In non elementum felis. Duis et aliquam nunc. Nunc pulvinar sapien nunc, vel pretium nisi efficitur in. Fusce fringilla maximus leo et maximus. Fusce at ligula laoreet, iaculis mi at, auctor odio. Praesent sed elementum justo. Aenean consectetur risus rhoncus tincidunt efficitur. Praesent dictum mauris at diam maximus maximus [@R-posterdown].
+
+# Conclusion / Limitations
+
+Try `posterdown` out! Hopefully you like it!
+
+```{r, include=FALSE}
+knitr::write_bib(c('knitr','rmarkdown','posterdown','pagedown'), 'packages.bib')
+```
+
+# References

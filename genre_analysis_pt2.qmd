@@ -9,23 +9,6 @@ library(tidyverse)
 library(forcats)
 ```
 
-###------------------------------------------------------------------------------------------------------
-
-test_df <- read_tsv(here::here("data.tsv")) |>    # this line takes very long time to load
-  mutate(imdbid = parse_number(tconst))
-movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE)%>%
- tibble::tibble()%>%
-  mutate(year=as.numeric(year),
-        id=as.numeric(id),
-        imdbid = as.numeric(imdbid))
-basics.movies <- left_join(movies_api, test_df,
-          by = "imdbid")
-sum(is.na(basics.movies$genres)) ## only 8 missing!!
-basics.movies$genres
-
-###------------------------------------------------------------------------------------------------------
-(don't need this code anymore because I created a new csv file to load in)^^^^
-
 
 ```{r message = F, warning=FALSE}
 basics.movies <- read_csv("data/basics_movies.csv")
@@ -34,11 +17,8 @@ head(basics.movies)
 
 ```{r}
 basics.movies <- basics.movies |>separate_rows(genres, sep = ",") # movies appear multiple times for multiple genres
-
 basics.movies <- basics.movies |> mutate(binary = if_else(rating == 3, "PASS", "FAIL"))
-
 ```
-
 
 
 ```{r}

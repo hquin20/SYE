@@ -73,14 +73,14 @@ movies_genre <- movies2 %>% unnest_tokens(output = "genre", input = "genre")
 
 ## Genre Analysis pt. 2
 
-test_df <- read_tsv(here::here("data.tsv")) |>    # not sure where I got this from 
+test_df <- read_tsv(here::here("data.tsv")) |>    # data downloaded from from IMDb website 
   mutate(imdbid = parse_number(tconst))
 movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE)%>%
   tibble::tibble()%>%
   mutate(year=as.numeric(year),
          id=as.numeric(id),
          imdbid = as.numeric(imdbid))
-basics.movies <- left_join(movies_api, test_df,
+basics.movies <- left_join(movies_api, test_df,   ## IMDb movies joined with bechdel test data set (api data)
                            by = "imdbid")
 sum(is.na(basics.movies$genres)) ## only 8 missing!!
 
@@ -119,7 +119,38 @@ movies_indi <- movies_indi |>
 
 write_csv(movies_indi, here::here("data/movies_indicator.csv"))
 
+## saving the grid because it is large to load in every time
 
+library(modelr)
+grid1 <- movies_indi |>
+  data_grid(
+    year = seq_range(year, n = 6),
+    binary = c(0, 1),
+    Animation = c(0, 1),
+    Action = c(0, 1),
+    Adult = c(0, 1),
+    Adventure = c(0, 1),
+    Biography = c(0, 1),
+    Comedy = c(0, 1),
+    Crime = c(0, 1),
+    Documentary = c(0, 1),
+    Drama = c(0, 1),
+    Family = c(0, 1),
+    Fantasy = c(0, 1),
+    History = c(0, 1),
+    Horror = c(0, 1),
+    Music = c(0, 1),
+    Musical = c(0, 1),
+    Mystery = c(0, 1),
+    Romance = c(0, 1),
+    Short = c(0, 1),
+    Sport = c(0, 1),
+    Thriller = c(0, 1),
+    War = c(0, 1),
+    Western = c(0, 1)
+  )
+
+write_csv(grid1, here::here("data/movies_grid1.csv"))
 
 ## API Data Set 
 

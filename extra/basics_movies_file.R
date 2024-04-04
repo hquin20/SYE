@@ -5,7 +5,7 @@ library(rvest)
 
 library(tidyverse)
 
-test_df <- read_tsv(here::here("title.basics.tsv")) |>   ## not sure where this data set is from 
+test_df <- read_tsv(here::here("title.basics.tsv")) |>   ## from IMDb website
   mutate(imdbid = parse_number(tconst))
 
 movies_api <- jsonlite::read_json('http://bechdeltest.com/api/v1/getAllMovies',simplifyVector = TRUE) %>%
