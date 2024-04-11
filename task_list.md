@@ -1,3 +1,10 @@
+## April 18
+
+1. Rough Draft of Poster
+
+2. Submit abstract: <https://www.stlawu.edu/offices/festival-science-scholarship-and-creativity/abstract-submission>
+
+
 ## April 11
 
 1. Making the graph for the "extra analysis part."
