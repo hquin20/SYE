@@ -150,6 +150,13 @@ grid1 <- movies_indi |>
     Western = c(0, 1)
   )
 
+grid1 <- grid1 |> mutate(sum = Animation + Action + Adult + Adventure  
+                + Biography + Comedy + Crime + Documentary + Drama + Family + 
+                  Fantasy + History + Horror + Music + Musical + Mystery + Romance + 
+                  Short + Sport + Thriller + War + Western) |>
+  filter(sum == 1) |> 
+  select(-sum)
+
 write_csv(grid1, here::here("data/movies_grid1.csv"))
 
 ## API Data Set 
