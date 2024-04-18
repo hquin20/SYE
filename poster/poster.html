@@ -19,7 +19,7 @@ Google fonts api stuff
 
 
 
-<title>Predicting the Bechdel Test through Statistical Modeling</title>
+<title>Predicting Bechdel Test Results through Statistical Modeling</title>
 
 
 
@@ -283,13 +283,13 @@ font-size: 20pt;
 </div>
 <!-- Poster Title -->
 <div class= "poster_title">
-<h1 id="title">Predicting the Bechdel Test through Statistical Modeling</h1>
-<h3 id="author">Hailey Quintavalle<sup></sup></h3><br>
-<h5 id="affiliation"><sup></sup> Department of Math, Computer Science, and Statistics, St. Lawrence University<br> <sup></sup> </h5>
+<h1 id="title">Predicting Bechdel Test Results through Statistical Modeling</h1>
+<h3 id="author">Hailey Quintavalle, Dr. Matt Higham<sup></sup></h3><br>
+<h5 id="affiliation"><sup></sup> Department of Math, Computer Science, and Statistics<br> <sup></sup> St. Lawrence University</h5>
 </div>
 <!-- Right Logo  -->
 <div class="logo_right">
-<img src=https://raw.githubusercontent.com/brentthorne/posterdown/master/images/betterhexlogo.png style="width: 80%">
+<img src=comic.png style="width: 80%">
 </div>
 </div>
 
@@ -297,11 +297,11 @@ font-size: 20pt;
 <div class='poster_body'>
 <div id="abstract" class="section level1">
 <h1>Abstract</h1>
-<p><strong>Goal</strong>: Investigate which aspects of a movie increase the likelihood of passing the Bechdel Test</p>
 <ul>
 <li><p>Combined IMDb data with Bechdel Test Movie List</p></li>
-<li><p>Logistic regression used to model release year and genres</p></li>
-<li><p>Further analysis examines budget, IMDb user ratings, Metascore ratings</p></li>
+<li><p>Logistic regression used to model <code>release year</code> and <code>genres</code></p></li>
+<li><p>Findings show more recent movies in the <em>Comedy</em> or <em>Romance</em> genre have higher predicted probability of passing compared to other genres</p></li>
+<li><p>Further analysis examines <code>budget</code>, <code>IMDb user ratings</code>, and <code>Metascore</code> ratings across time</p></li>
 </ul>
 </div>
 <div id="background" class="section level1">
@@ -311,29 +311,20 @@ font-size: 20pt;
 <ul>
 <li>Created by Alison Bechdel in 1986</li>
 <li>Originally a comic strip</li>
-<li>Used to assess the presence of women in movies [reference]</li>
+<li>Used to analyze the presence of women in movies [1]</li>
 </ul>
-<p>To pass, movie must pass 3 tests:</p>
-<ol style="list-style-type: decimal">
-<li>At least <strong>2</strong> named female characters</li>
-<li>Women must talk to each other</li>
-<li>Conversation about something <em>other than a man</em> [reference]</li>
-</ol>
+<p><img src="bechdelTest.jpg" width="70%" style="display: block; margin: auto;" /></p>
 <p><strong>Flaws</strong> of the Bechdel Test</p>
 <ul>
 <li>Too simple requirements</li>
-<li>Disregards which kinds of women have dialogue [1]
-<ul>
-<li>Age</li>
-<li>Race</li>
-</ul></li>
+<li>Disregards which kinds of women have dialogue [2]</li>
 </ul>
 </div>
 </div>
 <div id="data" class="section level1">
 <h1>Data</h1>
 <ul>
-<li><em>Data Source:</em> IMDb Non-Commercial Datasets</li>
+<li>Final data set contains <strong>10,178</strong> movies - ranging from <strong>1874 to 2023</strong></li>
 </ul>
 <table>
 <caption>
@@ -342,16 +333,16 @@ font-size: 20pt;
 <thead>
 <tr>
 <th style="text-align:center;">
-originalTitle
+Title
 </th>
 <th style="text-align:center;">
-year
+IMDb ID
 </th>
 <th style="text-align:center;">
-genres
+Year
 </th>
 <th style="text-align:center;">
-runtimeMinutes
+Genres
 </th>
 </tr>
 </thead>
@@ -359,6 +350,9 @@ runtimeMinutes
 <tr>
 <td style="text-align:center;">
 Star Wars
+</td>
+<td style="text-align:center;">
+76759
 </td>
 <td style="text-align:center;">
 1977
@@ -366,13 +360,13 @@ Star Wars
 <td style="text-align:center;">
 Action,Adventure,Fantasy
 </td>
-<td style="text-align:center;">
-121
-</td>
 </tr>
 <tr>
 <td style="text-align:center;">
 Grown Ups
+</td>
+<td style="text-align:center;">
+1375670
 </td>
 <td style="text-align:center;">
 2010
@@ -380,13 +374,13 @@ Grown Ups
 <td style="text-align:center;">
 Comedy
 </td>
-<td style="text-align:center;">
-102
-</td>
 </tr>
 <tr>
 <td style="text-align:center;">
 Bullet Train
+</td>
+<td style="text-align:center;">
+12593682
 </td>
 <td style="text-align:center;">
 2022
@@ -394,15 +388,10 @@ Bullet Train
 <td style="text-align:center;">
 Action,Comedy,Thriller
 </td>
-<td style="text-align:center;">
-127
-</td>
 </tr>
 </tbody>
 </table>
-<ul>
-<li><em>Data Source:</em> Bechdel Test Movie List (bechdeltest.com)</li>
-</ul>
+<p><em>Data Source:</em> IMDb Non-Commercial Datasets</p>
 <table>
 <caption>
 <span id="tab:mytable2">Table 2: </span>API Data
@@ -410,16 +399,16 @@ Action,Comedy,Thriller
 <thead>
 <tr>
 <th style="text-align:center;">
-title
+Title
 </th>
 <th style="text-align:center;">
-imdbid
+IMDb ID
 </th>
 <th style="text-align:center;">
-year
+Year
 </th>
 <th style="text-align:center;">
-rating
+Bechdel Rating
 </th>
 </tr>
 </thead>
@@ -429,7 +418,7 @@ rating
 Star Wars
 </td>
 <td style="text-align:center;">
-0076759
+76759
 </td>
 <td style="text-align:center;">
 1977
@@ -468,28 +457,114 @@ Bullet Train
 </tr>
 </tbody>
 </table>
-<ul>
-<li>Final data set contains <strong>10,178</strong> movies - ranging from 1874 to 2023</li>
-</ul>
+<p><em>Data Source:</em> Bechdel Test Movie List (bechdeltest.com)</p>
 </div>
 <div id="primary-model" class="section level1">
 <h1>Primary Model</h1>
-<p><span class="math inline">\(logit(pi) = Beta_0 + Beta_1X_1 + ...)\)</span> &lt;– type part of the final model here</p>
-<p><img src="poster_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><span class="math display">\[
+logit(\hat{\pi}) = \hat{\beta}_0 + \hat{\beta}_1 \cdot Year + \hat{\beta}_2 \cdot \text{Animation} + \hat{\beta}_3 \cdot \text{Action}
+\]</span></p>
+<p><span class="math display">\[
++ \hat{\beta}_4 \cdot \text{Adult} +  \hat{\beta}_5 \cdot \text{Adventure} +\ldots + \hat{\beta}_{29} \cdot \text{Year:Western}
+\]</span></p>
+<p><img src="poster_files/figure-html/unnamed-chunk-3-1.png" width="100%" /></p>
+<p><img src="poster_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><br />
+<br />
+<br />
+<br />
+<br />
+</p>
+<p><br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+</p>
 </div>
 <div id="further-analysis" class="section level1">
 <h1>Further Analysis</h1>
-<p>Aliquam sed faucibus risus, quis efficitur erat. Vestibulum semper mauris quis tempus eleifend. Aliquam sagittis dictum ipsum, quis viverra ligula eleifend ut. Curabitur sagittis vitae arcu eget faucibus. In non elementum felis. Duis et aliquam nunc. Nunc pulvinar sapien nunc, vel pretium nisi efficitur in. Fusce fringilla maximus leo et maximus. Fusce at ligula laoreet, iaculis mi at, auctor odio. Praesent sed elementum justo. Aenean consectetur risus rhoncus tincidunt efficitur. Praesent dictum mauris at diam maximus maximus <span class="citation">[@R-posterdown]</span>.</p>
+<p><img src="poster_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
+<p><em>Data Source</em>: [need source for this movie data] –&gt; github?</p>
+<table style="width:92%;">
+<caption>Table 3: Logistic Regression Model Coefficients</caption>
+<colgroup>
+<col width="25%" />
+<col width="18%" />
+<col width="18%" />
+<col width="13%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Estimate</th>
+<th align="center">Std. Error</th>
+<th align="center">z value</th>
+<th align="center">Pr(&gt;|z|)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>(Intercept)</strong></td>
+<td align="center">-29.56</td>
+<td align="center">17.86</td>
+<td align="center">-1.655</td>
+<td align="center">0.09793</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>budget_2013</strong></td>
+<td align="center">-4.733e-09</td>
+<td align="center">1.211e-09</td>
+<td align="center">-3.909</td>
+<td align="center">9.255e-05</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>year</strong></td>
+<td align="center">0.0161</td>
+<td align="center">0.00886</td>
+<td align="center">1.817</td>
+<td align="center">0.06923</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>imdb_rating</strong></td>
+<td align="center">-0.5709</td>
+<td align="center">0.1055</td>
+<td align="center">-5.413</td>
+<td align="center">6.213e-08</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>metascore</strong></td>
+<td align="center">0.02071</td>
+<td align="center">0.005734</td>
+<td align="center">3.611</td>
+<td align="center">0.0003046</td>
+</tr>
+</tbody>
+</table>
 </div>
-<div id="conclusion-limitations" class="section level1">
-<h1>Conclusion / Limitations</h1>
-<p>Try <code>posterdown</code> out! Hopefully you like it!</p>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<ul>
+<li><p>Genres with a <strong>higher</strong> probability of passing in recent years: <em>Romance, Adventure, Comedy</em>. Genres with <strong>lower</strong> probability of passing in recent years: <em>War, Western, Sport</em></p></li>
+<li><p>As <em>Metascore</em> <strong>increases</strong>, probability of passing <strong>increases</strong></p></li>
+<li><p>As <em>IMDb user rating</em> <strong>increases</strong>, probability of passing <strong>decreases</strong></p></li>
+</ul>
+<p><strong>Limitations</strong></p>
+<ul>
+<li>Data for <em>Further Analysis</em> only contains movies up to 2013</li>
+</ul>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
 <ol style="list-style-type: decimal">
-<li><p><a href="https://www.tandfonline.com/doi/full/10.1080/14680777.2016.1234239" class="uri">https://www.tandfonline.com/doi/full/10.1080/14680777.2016.1234239</a></p></li>
-<li><p><a href="https://aclanthology.org/N15-1084">Key Female Characters in Film Have More to Talk About Besides Men: Automating the Bechdel Test</a> (Agarwal et al., NAACL 2015)</p></li>
+<li><p>Alison Bechdel, 1986. <em>Dykes to watch out for</em>. Firebrand Books.</p></li>
+<li><p><a href="https://doi.org/10.1080/14680777.2016.1234239">What “The Bechdel Test” doesn’t tell us: examining women’s verbal and vocal (dis)empowerment in cinema</a> (O’Meara, J., 2016)</p></li>
 </ol>
 </div>
 </div>

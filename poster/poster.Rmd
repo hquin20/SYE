@@ -1,16 +1,17 @@
 ---
-title: Predicting the Bechdel Test through Statistical Modeling 
+title: Predicting Bechdel Test Results through Statistical Modeling 
 author:
-  - name: Hailey Quintavalle
+  - name: Hailey Quintavalle, Dr. Matt Higham
 affiliation:
-  - address: Department of Math, Computer Science, and Statistics, St. Lawrence University 
-  - adress: Advisor - Matt Higham
+  - address: Department of Math, Computer Science, and Statistics
+  - address: St. Lawrence University 
 column_numbers: 3
-logoright_name: https&#58;//raw.githubusercontent.com/brentthorne/posterdown/master/images/betterhexlogo.png
+logoright_name: "comic.png"
 logoleft_name: https&#58;//raw.githubusercontent.com/brentthorne/posterdown/master/images/betterhexlogo.png
 output: 
   posterdown::posterdown_html:
     self_contained: false
+   ## before_body: \setlength{\parskip}{0pt}
 ---
 
 ```{r setup, include=FALSE}
@@ -19,13 +20,13 @@ knitr::opts_chunk$set(echo = FALSE)
 
 # Abstract
 
-**Goal**: Investigate which aspects of a movie increase the likelihood of passing the Bechdel Test
-
 - Combined IMDb data with Bechdel Test Movie List
 
-- Logistic regression used to model release year and genres 
+- Logistic regression used to model `release year` and `genres`
 
-- Further analysis examines budget, IMDb user ratings, Metascore ratings 
+- Findings show more recent movies in the *Comedy* or *Romance* genre have higher predicted probability of passing compared to other genres
+
+- Further analysis examines `budget`, `IMDb user ratings`, and `Metascore` ratings across time
 
 
 # Background
@@ -34,40 +35,42 @@ knitr::opts_chunk$set(echo = FALSE)
 
 - Created by Alison Bechdel in 1986
 - Originally a comic strip 
-- Used to assess the presence of women in movies [reference]
+- Used to analyze the presence of women in movies [1]
 
-```{r}
-## knitr::include_graphics(here::here("poster/bechdelTest.jpg"))
+```{r out.width='70%', fig.align='center', fig.margin=TRUE}
+knitr::include_graphics(here::here("poster/bechdelTest.jpg"))
 ```
 
-
-To pass, movie must pass 3 tests:
-
-1. At least **2** named female characters
-2. Women must talk to each other
-3. Conversation about something *other than a man* [reference]
 
 **Flaws** of the Bechdel Test
 
 - Too simple requirements
-- Disregards which kinds of women have dialogue [1]
-  - Age
-  - Race
+- Disregards which kinds of women have dialogue [2]
 
 
 ```{r echo = F, message = F, warning = F}
 library(tidyverse)
-basics_movies <- read_csv("data/basics_movies.csv")
+basics_movies <- read_csv(here::here("data/basics_movies.csv"))
 
 table1 <- basics_movies |> 
-  select(originalTitle, year, genres, runtimeMinutes, imdbid) |> 
-  filter(originalTitle == "Grown Ups" | originalTitle == "Bullet Train" | originalTitle == "Star Wars")
+  select(originalTitle, imdbid, year, genres) |> 
+  filter(originalTitle == "Grown Ups" | originalTitle == "Bullet Train" | originalTitle == "Star Wars") |>
+  rename("Title" = "originalTitle", 
+         "Year" = "year",
+         "Genres" = "genres",
+       #  "Run Time (min)" = "runtimeMinutes",
+         "IMDb ID" = "imdbid")
 
-movies_api <- read_csv("data/movies_api.csv")
+movies_api <- read_csv(here::here("data/movies_api.csv"))
 
 table2 <- movies_api |> 
-  select(-id) |> 
-  filter(title == "Grown Ups" | title == "Bullet Train" | title == "Star Wars")
+  select(-id) |>
+  mutate(imdbid = as.numeric(imdbid)) |>
+  filter(title == "Grown Ups" | title == "Bullet Train" | title == "Star Wars") |>
+  rename("Title" = "title",
+         "IMDb ID" = "imdbid",
+         "Year" = "year",
+         "Bechdel Rating" = "rating") 
 
 ```
 
@@ -75,20 +78,22 @@ table2 <- movies_api |>
 
 # Data
 
-- *Data Source:* IMDb Non-Commercial Datasets
 
-```{r mytable1, out.width='80%'}
+- Final data set contains **10,178** movies - ranging from **1874 to 2023**
+
+```{r mytable1}
 knitr::kable(table1[1:3, 1:4], caption = 'IMDb Data',align = 'c',"html")
 ```
 
-- *Data Source:* Bechdel Test Movie List (bechdeltest.com)
+*Data Source:* IMDb Non-Commercial Datasets
 
-```{r mytable2, out.width='80%'}
+
+```{r mytable2}
 knitr::kable(table2[1:3, 1:4], caption = 'API Data',align = 'c',"html")
 ```
 
+*Data Source:* Bechdel Test Movie List (bechdeltest.com)
 
-- Final data set contains **10,178** movies - ranging from 1874 to 2023
 
 
 
@@ -99,13 +104,22 @@ knitr::kable(table2[1:3, 1:4], caption = 'API Data',align = 'c',"html")
 
 # Primary Model 
 
-$logit(pi) = Beta_0 + Beta_1X_1 + ...)$  <-- type part of the final model here
 
-```{r echo = F, message = F, warning = F, cache = T}
+$$
+logit(\hat{\pi}) = \hat{\beta}_0 + \hat{\beta}_1 \cdot Year + \hat{\beta}_2 \cdot \text{Animation} + \hat{\beta}_3 \cdot \text{Action}
+$$
+
+$$
++ \hat{\beta}_4 \cdot \text{Adult} +  \hat{\beta}_5 \cdot \text{Adventure} +\ldots + \hat{\beta}_{29} \cdot \text{Year:Western}
+$$
+
+
+
+```{r echo = F, message = F, warning = F, cache = T, out.width='100%'}
 library(tidyverse)
-movies_indi <- read_csv("data/movies_indicator.csv")
+movies_indi <- read_csv(here::here("data/movies_indicator.csv"))
 
-new_grid <- read_csv("data/movies_grid1.csv")
+new_grid <- read_csv(here::here("data/movies_grid1.csv"))
 library(modelr)
 library(broom)
 
@@ -134,37 +148,125 @@ list3 <- aug_mod3 |> pivot_longer(cols = c(Animation, Action, Adult, Adventure, 
 movies_pass <- movies_indi |> filter(binary == 1)
 movies_fail <- movies_indi |> filter(binary == 0)
 
-list3 |> filter(values == 1, genre %in% c("Sport", "Comedy", "Romance", "Action", "Documentary", "War", "Western")) |> 
+list3 |> filter(values == 1, genre %in% 
+                  c("Sport", "Comedy", "Romance", "Adventure", "Action", "Documentary", "War", "Western")) |> 
   mutate(genre = fct_reorder2(genre, .x = year, .y = .pi)) |>
-  ggplot(aes(x = year, y = .pi)) +                      # need to pick which genres to keep in visual
-  geom_line(aes(color = genre), linewidth = 0.8) + 
+  ggplot(aes(x = year, y = .pi)) +                      
+  geom_line(aes(color = genre), linewidth = 0.9) + 
   geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +  ## alpha = 0.4
   geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") +  
   scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) + 
-  theme_minimal() +
+  theme_minimal(base_size = 14) +
   labs(x = "\nYear",
        y = "Probabilty of Passing\n", 
        color = "Genre",
        title = "Different Genres Passing the Bechdel Test Over Time") +
-  scale_color_viridis_d()  ## make font and lines bigger for poster
+  scale_color_viridis_d()
+
+```
+
+
+```{r}
+
+## maybe same plot with different genres?? 
+
+list3 |> filter(values == 1, genre %in% 
+                  c("Sport", "Comedy", "Romance", "Adventure", "Action", "Documentary", "War", "Western")) |> 
+  mutate(genre = fct_reorder2(genre, .x = year, .y = .pi)) |>
+  ggplot(aes(x = year, y = .pi)) +                      
+  geom_line(aes(color = genre), linewidth = 0.9) + 
+  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +  ## alpha = 0.4
+  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") +  
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) + 
+  theme_minimal(base_size = 14) +
+  labs(x = "\nYear",
+       y = "Probabilty of Passing\n", 
+       color = "Genre",
+       title = "Different Genres Passing the Bechdel Test Over Time") +
+  scale_color_viridis_d()
 ```
 
 
 
+\
+\
+\
+\
+\
 
-
-
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
 
 
 
 
 # Further Analysis
 
-Aliquam sed faucibus risus, quis efficitur erat. Vestibulum semper mauris quis tempus eleifend. Aliquam sagittis dictum ipsum, quis viverra ligula eleifend ut. Curabitur sagittis vitae arcu eget faucibus. In non elementum felis. Duis et aliquam nunc. Nunc pulvinar sapien nunc, vel pretium nisi efficitur in. Fusce fringilla maximus leo et maximus. Fusce at ligula laoreet, iaculis mi at, auctor odio. Praesent sed elementum justo. Aenean consectetur risus rhoncus tincidunt efficitur. Praesent dictum mauris at diam maximus maximus [@R-posterdown].
+```{r warning = F, message = F, echo = F, out.width='100%'}
+library(modelr)
+library(broom)
+library(tidyverse)
+movies2 <- read_csv(here::here("data/movies_sentiment.csv"))
 
-# Conclusion / Limitations
+movies2 <- movies2 %>% mutate(binary_0 = ifelse(binary == "PASS", 1, 0))
 
-Try `posterdown` out! Hopefully you like it!
+mod_year <- glm(binary_0 ~  budget_2013 +
+                  year + 
+                  imdb_rating +                 
+                  metascore,                     
+                data = movies2, family = "binomial") 
+
+grid <- movies2 |>
+  data_grid(
+    year = seq_range(year, n = 4),
+    binary_0 = c(0, 1),
+    imdb_rating = seq_range(imdb_rating, n = 6),
+    budget_2013 = median(movies2$budget_2013, na.rm = T),
+    metascore = seq_range(metascore, n = 4)
+    )
+
+aug_year <- augment(mod_year, newdata = grid, se_fit = TRUE)
+aug_year <- aug_year |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
+
+ggplot(data = aug_year, aes(x = metascore, y = .pi)) +
+  geom_line(aes(color = as.factor(round(imdb_rating))), linewidth = 1) +
+  facet_wrap(~ year) + 
+  labs(y = "Probability of Passing Test",
+       x = "Metascore",       ## possibly scale the x-axis?
+       title = "Passing as a Function of Budget and Ratings Over Time") +
+  scale_color_viridis_d(name = "IMDB Rating") +
+  theme_minimal(base_size = 14)
+```
+
+*Data Source*: [need source for this movie data] --> github?
+
+```{r warning = F}
+library(pander)
+
+mod_year |> pander(caption = "Table 3: Logistic Regression Model Coefficients")
+```
+
+
+# Conclusion
+
+- Genres with a **higher** probability of passing in recent years: *Romance, Adventure, Comedy*. Genres with **lower** probability of passing in recent years: *War, Western, Sport*
+
+- As *Metascore* **increases**, probability of passing **increases**
+
+- As *IMDb user rating* **increases**, probability of passing **decreases**
+
+**Limitations**
+
+- Data for *Further Analysis* only contains movies up to 2013
+
 
 ```{r, include=FALSE}
 knitr::write_bib(c('knitr','rmarkdown','posterdown','pagedown'), 'packages.bib')
@@ -172,9 +274,13 @@ knitr::write_bib(c('knitr','rmarkdown','posterdown','pagedown'), 'packages.bib')
 
 # References
 
-1. <https://www.tandfonline.com/doi/full/10.1080/14680777.2016.1234239>
+1. Alison Bechdel, 1986. *Dykes to watch out for*. Firebrand Books.
 
-2. [Key Female Characters in Film Have More to Talk About Besides Men: Automating the Bechdel Test](https://aclanthology.org/N15-1084) (Agarwal et al., NAACL 2015)
+2. [What “The Bechdel Test” doesn’t tell us: examining women’s verbal and vocal (dis)empowerment in cinema](https://doi.org/10.1080/14680777.2016.1234239) (O’Meara, J., 2016)
+
+
+
+
 
 
 
