@@ -50,14 +50,14 @@ padding: 0cm;
 width: 45in;
 height: calc(38in * 0.15);
 overflow: hidden;
-background-color: #0b4545;
+background-color: #147490;
 border: 0 solid #0b4545;
 }
 .logo_left {
 float: left;
 width: 10%;
 height: 100%;
-background-color: #0b4545;
+background-color: #147490;
 display: flex;
 align-items: center;
 justify-content: center;
@@ -66,7 +66,7 @@ justify-content: center;
 float: right;
 width: 10%;
 height: 100%;
-background-color: #0b4545;
+background-color: #147490;
 display: flex;
 align-items: center;
 justify-content: center;
@@ -119,9 +119,9 @@ column-rule-width: 1mm;
 -webkit-column-rule-style: dashed;
 -moz-column-rule-style: dashed;
 column-rule-style: dashed;
--webkit-column-rule-color: #0b4545;
--moz-column-rule-color: #0b4545;
-column-rule-color: #0b4545;
+-webkit-column-rule-color: #147490;
+-moz-column-rule-color: #147490;
+column-rule-color: #147490;
 column-gap: 1em;
 padding-left: 0.5em;
 padding-right: 0.5em;
@@ -171,8 +171,8 @@ margin-bottom: 0;
 text-align: center;
 color: #FFFFFF;
 font-size: 65pt;
-border: 2mm solid #0b4545;
-background-color: #0b4545;
+border: 2mm solid #147490;
+background-color: #147490;
 border-radius: 4mm 0mm;
 margin-top: 2mm;
 margin-bottom: 2mm;
@@ -225,7 +225,7 @@ code {
 font-size: 1em;
 font-family: monospace;
 background-color: #00808024;
-color: #0b4545;
+color: #147490;
 padding: 1.2mm;
 border-radius: 2mm;
 }
@@ -279,13 +279,13 @@ font-size: 20pt;
 <div class="title_container">
 <!-- Left Logo  -->
 <div class="logo_left">
-<img src= 'https://raw.githubusercontent.com/brentthorne/posterdown/master/images/betterhexlogo.png' style="width: 80%">
+<img src= 'slu_logo3.jpg' style="width: 80%">
 </div>
 <!-- Poster Title -->
 <div class= "poster_title">
 <h1 id="title">Predicting Bechdel Test Results through Statistical Modeling</h1>
-<h3 id="author">Hailey Quintavalle, Dr. Matt Higham<sup></sup></h3><br>
-<h5 id="affiliation"><sup></sup> Department of Math, Computer Science, and Statistics<br> <sup></sup> St. Lawrence University</h5>
+<h3 id="author">Hailey Quintavalle<sup></sup></h3><br>
+<h5 id="affiliation"><sup></sup> Matt Higham (Advisor)<br> <sup></sup> Department of Math, Computer Science, and Statistics<br> <sup></sup> St. Lawrence University</h5>
 </div>
 <!-- Right Logo  -->
 <div class="logo_right">
@@ -298,28 +298,30 @@ font-size: 20pt;
 <div id="abstract" class="section level1">
 <h1>Abstract</h1>
 <ul>
-<li><p>Combined IMDb data with Bechdel Test Movie List</p></li>
 <li><p>Logistic regression used to model <code>release year</code> and <code>genres</code></p></li>
-<li><p>Findings show more recent movies in the <em>Comedy</em> or <em>Romance</em> genre have higher predicted probability of passing compared to other genres</p></li>
-<li><p>Further analysis examines <code>budget</code>, <code>IMDb user ratings</code>, and <code>Metascore</code> ratings across time</p></li>
+<li><p>Rating analysis examines <code>budget</code>, <code>IMDb user ratings</code>, and <code>Metascore</code> ratings across time</p></li>
+<li><p>Findings show more recent movies in the <em>Comedy</em> or <em>Romance</em> genre have <strong>higher predicted probability</strong> of passing compared to other genres</p>
+<ul>
+<li><strong>Higher</strong> critic ratings and <strong>lower</strong> user ratings = more likely to pass</li>
+</ul></li>
 </ul>
 </div>
-<div id="background" class="section level1">
-<h1>Background</h1>
-<div id="what-is-the-bechdel-test" class="section level2">
-<h2>What is the <strong>Bechdel Test</strong>?</h2>
+<div id="what-is-the-bechdel-test" class="section level1">
+<h1>What is the Bechdel Test?</h1>
 <ul>
 <li>Created by Alison Bechdel in 1986</li>
 <li>Originally a comic strip</li>
 <li>Used to analyze the presence of women in movies [1]</li>
 </ul>
 <p><img src="bechdelTest.jpg" width="70%" style="display: block; margin: auto;" /></p>
+<div style="text-align: center;">
+<p>Movie must contain <strong>two named women</strong> who have a <strong>conversation</strong> that is <strong>NOT</strong> about a <em>man</em>.</p>
+</div>
 <p><strong>Flaws</strong> of the Bechdel Test</p>
 <ul>
 <li>Too simple requirements</li>
 <li>Disregards which kinds of women have dialogue [2]</li>
 </ul>
-</div>
 </div>
 <div id="data" class="section level1">
 <h1>Data</h1>
@@ -424,7 +426,7 @@ Star Wars
 1977
 </td>
 <td style="text-align:center;">
-1
+Fail
 </td>
 </tr>
 <tr>
@@ -438,7 +440,7 @@ Grown Ups
 2010
 </td>
 <td style="text-align:center;">
-3
+Pass
 </td>
 </tr>
 <tr>
@@ -452,45 +454,37 @@ Bullet Train
 2022
 </td>
 <td style="text-align:center;">
-1
+Fail
 </td>
 </tr>
 </tbody>
 </table>
 <p><em>Data Source:</em> Bechdel Test Movie List (bechdeltest.com)</p>
 </div>
-<div id="primary-model" class="section level1">
-<h1>Primary Model</h1>
+<div id="rating-analysis" class="section level1">
+<h1>Rating Analysis</h1>
 <p><span class="math display">\[
-logit(\hat{\pi}) = \hat{\beta}_0 + \hat{\beta}_1 \cdot Year + \hat{\beta}_2 \cdot \text{Animation} + \hat{\beta}_3 \cdot \text{Action}
+logit(\pi) = \beta_0 + \beta_1 \cdot \text{Budget} + \beta_2 \cdot \text{Year} + \beta_3 \cdot \text{IMDb Rating}
 \]</span></p>
 <p><span class="math display">\[
-+ \hat{\beta}_4 \cdot \text{Adult} +  \hat{\beta}_5 \cdot \text{Adventure} +\ldots + \hat{\beta}_{29} \cdot \text{Year:Western}
++  \text{ } \beta_4 \cdot \text{Metascore}
 \]</span></p>
+<ul>
+<li><p><span class="math inline">\(logit\)</span> = log odds of passing the test</p></li>
+<li><p><span class="math inline">\(\pi\)</span> = probability</p></li>
+<li><p><span class="math inline">\(IMDb \text{ } Rating\)</span> = <strong>User</strong> ratings</p></li>
+<li><p><span class="math inline">\(Metascore\)</span> = <strong>Critic</strong> ratings</p></li>
+</ul>
 <p><img src="poster_files/figure-html/unnamed-chunk-3-1.png" width="100%" /></p>
-<p><img src="poster_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p><br />
-<br />
-<br />
-<br />
-<br />
-</p>
-<p><br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-</p>
-</div>
-<div id="further-analysis" class="section level1">
-<h1>Further Analysis</h1>
-<p><img src="poster_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
-<p><em>Data Source</em>: [need source for this movie data] –&gt; github?</p>
+<p><em>Data Source</em>: TidyTuesday social data project (Github)</p>
+<div id="interpretation" class="section level2">
+<h2><u><strong>Interpretation</strong></u></h2>
+<p><em>Predicted probability</em> of a movie PASSING <strong>increases</strong> for:</p>
+<ul>
+<li><p>Movies with <strong>lower budgets</strong></p></li>
+<li><p>Movies with <strong>lower IMDb user ratings</strong></p></li>
+<li><p>Movies with <strong>higher critic ratings</strong></p></li>
+</ul>
 <table style="width:92%;">
 <caption>Table 3: Logistic Regression Model Coefficients</caption>
 <colgroup>
@@ -548,17 +542,38 @@ logit(\hat{\pi}) = \hat{\beta}_0 + \hat{\beta}_1 \cdot Year + \hat{\beta}_2 \cdo
 </tbody>
 </table>
 </div>
-<div id="conclusion" class="section level1">
-<h1>Conclusion</h1>
+</div>
+<div id="genre-analysis" class="section level1">
+<h1>Genre Analysis</h1>
+<p><span class="math display">\[
+logit(\pi) = \beta_0 + \beta_1 \cdot Year + \beta_2 \cdot \text{Animation} + \beta_3 \cdot \text{Action} + \beta_4 \cdot \text{Adult}
+\]</span></p>
+<p><span class="math display">\[
++ \text{ } \beta_5 \cdot \text{Adventure} +\ldots + \beta_{29} \cdot \text{Year:Western}
+\]</span></p>
 <ul>
-<li><p>Genres with a <strong>higher</strong> probability of passing in recent years: <em>Romance, Adventure, Comedy</em>. Genres with <strong>lower</strong> probability of passing in recent years: <em>War, Western, Sport</em></p></li>
-<li><p>As <em>Metascore</em> <strong>increases</strong>, probability of passing <strong>increases</strong></p></li>
-<li><p>As <em>IMDb user rating</em> <strong>increases</strong>, probability of passing <strong>decreases</strong></p></li>
+<li><p><span class="math inline">\(Animation\)</span> = 1 (<em>yes</em>) or 0 (<em>no</em>)</p></li>
+<li><p><span class="math inline">\(Year:Western\)</span> = interaction term</p></li>
 </ul>
-<p><strong>Limitations</strong></p>
+<p><img src="poster_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
+<div id="interpretation-1" class="section level2">
+<h2><u><strong>Interpretation</strong></u></h2>
+<p>For recent years, genres with <strong>higher probability</strong> of PASSING:</p>
 <ul>
-<li>Data for <em>Further Analysis</em> only contains movies up to 2013</li>
+<li><em>Romance, Adventure, Comedy</em></li>
 </ul>
+<p>Genres with <strong>lower probability</strong> of PASSING:</p>
+<ul>
+<li><em>War, Western, Sport</em></li>
+</ul>
+</div>
+</div>
+<div id="limitations" class="section level1">
+<h1>Limitations</h1>
+<ol style="list-style-type: decimal">
+<li><p>Data for <em>Rating Analysis</em> only contains movies up to 2013</p></li>
+<li><p>Bechdel data contains most popular movies reported by users</p></li>
+</ol>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
