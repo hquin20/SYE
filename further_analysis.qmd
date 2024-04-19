@@ -4,10 +4,10 @@ format: html
 editor: visual
 ---
 
-```{r message = F}
+```{r message = F, warning = F}
 library(tidyverse)
 library(broom)
-movies2 <- read_csv("data/movies_sentiment.csv")
+movies2 <- read_csv(here::here("data/movies_sentiment.csv"))
 movies2
 ```
 
@@ -16,11 +16,13 @@ movies2 <- movies2 %>% mutate(binary_0 = ifelse(binary == "PASS", 1, 0))
 
 mod_year <- glm(binary_0 ~  budget_2013 +
                   year + 
-                  imdb_rating,                   ## I want IMBD rating AND metascore to compare,
-             #     metascore,                       ## but should I graph them separately?
+                  imdb_rating +                  
+                  metascore,                      
                 data = movies2, family = "binomial") 
 summary(mod_year) 
 ```
+** pander or kable the model and it will provide coefficient table
+
 
 ```{r}
 library(modelr)
@@ -29,8 +31,8 @@ grid <- movies2 |>
     year = seq_range(year, n = 4),
     binary_0 = c(0, 1),
     imdb_rating = seq_range(imdb_rating, n = 6),
-    budget_2013 = seq_range(budget_2013, n = 8),
-  #  metascore = seq_range(metascore, n = 4)
+    budget_2013 = median(movies2$budget_2013, na.rm = T),
+    metascore = seq_range(metascore, n = 4)
     )
 
 
@@ -38,19 +40,17 @@ aug_year <- augment(mod_year, newdata = grid, se_fit = TRUE)
 aug_year <- aug_year |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
 
 
-ggplot(data = aug_year, aes(x = budget_2013, y = .pi)) +
+ggplot(data = aug_year, aes(x = metascore, y = .pi)) +
   geom_line(aes(color = as.factor(round(imdb_rating))), linewidth = 1) +
   facet_wrap(~ year) + 
   labs(y = "Probability of Passing Test",
-       x = "Movie Budget",       ## possibly scale the x-axis?
+   #    x = "Movie Budget",       ## possibly scale the x-axis?
        title = "Passing as a Function of Budget and IMDB Ratings Over Time") +
-  scale_color_viridis_d(name = "IMDB Rating")
+  scale_color_viridis_d(name = "IMDB Rating") +
+  theme_minimal()
 ```
 
-^^ This plot does not include metascores, but i still want my model to
 
-**I would like to graphically show the opposing effects of user scores and critics scores -- how should I go about this?
 
---> should i create two different models - one with user scores and one with critic scores and plot them together?
 
 

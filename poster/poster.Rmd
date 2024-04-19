@@ -13,7 +13,7 @@ logoleft_name: "slu_logo4.svg"
 logoleft_options: ["style='width: 1000px;'"]
 output: 
   posterdown::posterdown_html:
-    self_contained: false
+    self_contained: true
 primary_colour: "#147490"
 secondary_color: "#0b4545"
 ---
@@ -104,9 +104,9 @@ $$
 +  \text{ } \beta_4 \cdot \text{Metascore}
 $$
 
--   $logit$ = log odds of passing the test
+-   $\pi$ = probability of passing the test
 
--   $\pi$ = probability
+-   $logit$ = log odds of passing the test
 
 -   $IMDb \text{ } Rating$ = **User** ratings
 
@@ -171,7 +171,6 @@ mod_year |> pander(caption = "Table 3: Logistic Regression Model Coefficients")
 ```
 
 
-
 # Genre Analysis
 
 $$
@@ -227,7 +226,7 @@ list3 |> filter(values == 1, genre %in%
   geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +  ## alpha = 0.4
   geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") +  
   scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) + 
-  theme_minimal(base_size = 16) +
+  theme_minimal(base_size = 19) +
   labs(x = "\nYear",
        y = "Probabilty of Passing\n", 
        color = "Genre",
