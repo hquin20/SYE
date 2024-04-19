@@ -9,7 +9,7 @@ affiliation:
 column_numbers: 3
 logoright_name: "comic.png"
 logoright_options: ["style='width: 200px;'"]
-logoleft_name: "slu_logo3.jpg"   ## need to fix this logo ??
+logoleft_name: "slu_logo4.svg"
 logoleft_options: ["style='width: 1000px;'"]
 output: 
   posterdown::posterdown_html:
