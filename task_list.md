@@ -1,3 +1,46 @@
+## Poster Notes from April 18
+
+1. Left Panel
+
+- theme/color scale
+
+- put advisor below name
+
+- Abstract: 
+
+  - cut 1st line
+  - add further analysis conclusion bullet
+  - bold some words like **higher predicted probability**
+  
+- add bullet point below picture
+
+- change *Background* to *What is the Bechdel Test?*
+
+- replace *Bechdel Rating* to pass/fail binary variable
+
+2. Middle and Right Panel
+
+- Put *Rating Analysis* in the middle panel 
+
+  - model --> plot --> interpretations --> table
+  - define logit (log odds of passing), pi (probability), Animation (1 or 0), Year:Western (interaction)
+  
+- *Genre Analysis* in the right panel
+
+  - model --> plot --> interpretations
+  
+- up base font size of all plots
+
+- change conclusions to just limitations? (see about size)
+
+- limitations:
+
+  - movies up to 2013
+  - flaws of the bechdel test
+  - bechdel data contains popular movies only (?) --> reported by users 
+  
+  
+
 ## April 18
 
 1. Rough Draft of Poster
