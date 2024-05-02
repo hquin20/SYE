@@ -1,8 +1,209 @@
 ---
-title: "Official title of project"
+title: "Predicting Bechdel Test Results through Statistical Modeling"
 author: "Hailey Quintavalle"
 format: pdf
 ---
+
+```{r echo = F, warning = F, message = F}
+library(tinytex)
+library(tidyverse)
+basics_movies <- read_csv(here::here("data/basics_movies.csv"))
+```
+
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+
+# Abstract 
+
+The Bechdel Test is a simple measurement designed to analyze the representation of women in film. To pass, a movie must have two female characters who have a conversation that is not about a man. The present research aims to use genre, release year, movie budget, user ratings, and critics rating scores to predict the probability a movie will pass the test. Logistic regression analysis reveals more recent movies are predicted to have a higher probability of passing the test. For most years, genres such as Romance and Comedy are predicted to have a higher probability of passing, while genres such as Action, Sport, War, and Western are predicted to have a lower probability of passing the test. Although the Bechdel Test has its flaws, the test is a useful metric to bring attention to the roles women hold in film. 
+
+
+
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+
+
+
+# Introduction
+
+If you think of your all-time favorite movie, try to think about how many of the main characters were women. In 2023, 35% of speaking roles in movies belonged to women, and only 28% of the top grossing films contained female protagonists (Lauzen, 2024). Just one decade before, in 2013, women occupied 30% of all speaking roles and just 15% of protagonists were women (Lauzen, 2014). This is a small change for a span of 10 years, showcasing the underrepresentation of women in film, and the slow steps towards progress the film industry seems to be taking. As we examine the portrayal of women's roles in film, it is useful to explore various criteria used to measure their representation. One notable measure is the Bechdel Test, unintentionally introduced by American cartoonist Alison Bechdel in 1986, and the primary measure of women in film that is the focus of the present analysis. 
+
+The Bechdel Test originated from a comic strip titled "The Rule", a part of her comic *Dykes To Watch Out For*. The comic depicts two women discussing certain criteria necessary for them to watch a movie. The criteria for a movie included: two named women, who talked to each other, and held a conversation with each other that was not about a man. In the early 2000s, the test quickly gained popularity online and has since been used as a common tool for analyzing the role of women in film. 
+
+The test has only three basic requirements, meaning that a film can pass with just one line. Because of the simplicity of this tool, many have come forward with fair criticisms of the test. For example, the test does not take into account demographic factors, such as age, the voices of women of color, or those who do not speak English as their first language (O’Meara, 2016). Other flaws of the test include the oversight of conversations that are not directly about a man, but may be indirectly about them, where the conclusion of the test are unclear. 
+
+Regardless of its flaws, the Bechdel Test is a straightforward and easy tool that allows people to quickly make base assumptions about the presence of women in film. For this reason, this analysis will be examining the characteristics of thousands of movies in an attempt to use logistic regression analysis to model the likelihood of passing the Bechdel Test.
+
+
+Read the comic [here](https://lithub.com/read-the-1985-comic-strip-that-inspired-the-bechdel-test/).
+
+
+
+## Data
+
+The data used for the present analysis comes from a combination of multiple online sources. A data set containing 10,183 movie titles was available through IMDb Non-Commercial Datasets. Release dates for these movies range from 1874 to 2023. Variables included in this data set can be seen in the preview of the data below. 
+
+IMDb Non-Commercial Data set:
+
+```{r}
+basics_movies |> 
+  select(tconst, titleType, primaryTitle, originalTitle,
+         isAdult, startYear, runtimeMinutes, genres) |>
+  head() ## |> pander::pander() 
+
+## test_df <- read_tsv(here::here("data/title.basics.tsv")) |>    # data downloaded from from IMDb website 
+##   mutate(imdbid = parse_number(tconst))
+```
+
+
+Other data that was used in this analysis comes from the Bechdel Test Movie List, where users can submit movies with their Bechdel test rating through their online platform. The data set pulled from this website contains 10,251 movies with release dates ranging from 1874 to 2024. For the rating variable, a movie is given a rating from one to three, directly corresponding with the number of requirements of the Bechdel test that it passes. A preview of this data can be shown below.
+
+```{r message = F, warning = F}
+movies_api <- read_csv("data/movies_api.csv")
+movies_api |> head()
+```
+
+The final data set that was used in this analysis comes from the [TidyTuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-09/readme.md) social data project through GitHub. This data set contains 1,794 movies released from 1970 up to 2013.
+
+
+```{r message = F, warning = F}
+movies <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/movies.csv')
+
+movies |> select(-error) |> head()
+```
+
+
+# Modeling
+
+
+Full model with all genres and all interactions: 
+
+[insert model] ??why wont latex work here??
+
+
+```{r echo = F, message = F, warning = F, cache = T, out.width='100%'}
+library(tidyverse)
+movies_indi <- read_csv(here::here("data/movies_indicator.csv"))
+
+new_grid <- read_csv(here::here("data/movies_grid1.csv"))
+library(modelr)
+library(broom)
+
+mod3 <- glm(factor(binary) ~ year + Animation + Action + Adult + Adventure +
+              Biography + Comedy + Crime + Documentary + Drama +
+              Family + Fantasy + History + Horror + Music +
+              Musical + Mystery + Romance + Short + Sport +
+              Thriller + War + Western +
+              year:Animation + year:Action + year:Adult + year:Adventure +
+              year:Biography + year:Comedy + year:Crime + year:Documentary + year:Drama +
+              year:Family + year:Fantasy + year:History + year:Horror + year:Music +
+              year:Musical + year:Mystery + year:Romance + year:Short + year:Sport +
+              year:Thriller + year:War + year:Western, 
+            family = "binomial", data = movies_indi)
+
+aug_mod3 <- augment(mod3, newdata = new_grid, se_fit = TRUE)
+
+aug_mod3 <- aug_mod3 |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
+
+list3 <- aug_mod3 |> pivot_longer(cols = c(Animation, Action, Adult, Adventure, Biography, Comedy, 
+                                           Crime, Documentary, Drama, Family, Fantasy, History, 
+                                           Horror, Music, Musical, Mystery, Romance, Short, 
+                                           Sport, Thriller, War, Western), names_to = "genre", 
+                                  values_to = "values")
+
+movies_pass <- movies_indi |> filter(binary == 1)
+movies_fail <- movies_indi |> filter(binary == 0)
+```
+
+
+
+
+
+```{r}
+list3 |> filter(values == 1, genre %in% 
+                  c("Sport", "Comedy", "Romance", "Adventure", "Action", "Documentary", "War", "Western")) |> 
+  mutate(genre = fct_reorder2(genre, .x = year, .y = .pi)) |>
+  ggplot(aes(x = year, y = .pi)) +                      
+  geom_line(aes(color = genre), linewidth = 0.9) + 
+  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +  ## alpha = 0.4
+  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") +  
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) + 
+  theme_minimal(base_size = 11) +
+  labs(x = "\nYear",
+       y = "Probabilty of Passing\n", 
+       color = "Genre",
+       title = "Different Genres Over Time") +
+  scale_color_viridis_d()
+
+```
+
+
+# Conclusion
+
+
+
+
+
+# References
+
+1. Alison Bechdel, 1986. *Dykes to watch out for*. Firebrand Books.
+
+
+2. Lauzen, M. (2024). It’s a Man’s (Celluloid) World: Portrayals of female characters in the top grossing U.S. Films of 2023. *Center for the Study of Women in Television & Film*. https://womenintvfilm.sdsu.edu/its-a-mans-celluloid-world-portrayals-of-female-characters-in-the-top-grossing-u-s-films-of-2023/ 
+
+
+3. Lauzen, M. (2014). It’s a Man’s (Celluloid) World: On-Screen Representations of Female Characters in the Top 100 Films of 2013. *Center for the Study of Women in Television & Film*. https://womenintvfilm.sdsu.edu/files/2013_It’s_a_Man’s_World_Report.pdf 
+
 
 
 
