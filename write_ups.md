@@ -18,6 +18,25 @@ Genre Analysis:
 We investigated the sentiment of movies that either pass or fail the bechdel test, separated by movie genre. This was done using a rough sentiment score that was created to place a value on the number of posiitve/negative words included in the plot summary. A series of boxplots were created to show these trends, but there are no obvious differences within genres. Looking within each genre specifically, the number of movies that pass and fail the bechdel test was examined over time. Some intertesting trends were seen among these plots. For example, within action movies, the number of movies that fail the test increase at a higher rate than the number of movies that pass the test over time. For comedy movies, the number of movies that pass over time was higher than the number of movies that fail during the mid 2000s, but this trend seems to reverse in the recent decade. This analysis was conducted using the data set used for previous exploratory and sentiment analyses, but only includes movies up until 2013. Future analysis on genre would like to inlcude more movies from the recent decade, so the first step for next semester will be searching for a newer data set. 
 
 
+write up notes -----------------
+
+intro
+
+data
+
+  summary plots? (exploratory data analysis)
+  
+modeling
+
+  different models --> full model output
+  describe indicators in detail --> examples 
+  plots & interpretations
+  (show all movie genres through separate plots)
+
+conclusion
+
+  think about mentioning sentiment analysis --> future work? (lack of data)
+
 
 
 

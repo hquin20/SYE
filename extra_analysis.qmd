@@ -1,0 +1,43 @@
+---
+title: "Regression Analysis"
+format: html
+editor: visual
+---
+
+```{r message = F}
+library(tidyverse)
+library(broom)
+movies2 <- read_csv("data/movies_sentiment.csv")
+movies2
+```
+
+```{r}
+movies2 <- movies2 %>% mutate(binary_0 = ifelse(binary == "PASS", 1, 0))
+
+mod_year <- glm(binary_0 ~ budget_2013 +
+                  year + 
+                  imdb_rating + metascore,
+                data = movies2, family = "binomial") 
+summary(mod_year) 
+```
+
+```{r}
+library(modelr)
+grid <- movies2 |>
+  data_grid(
+    year = seq_range(year, n = 4),
+    binary_0 = c(0, 1),
+    imdb_rating = seq_range(imdb_rating, n = 6),
+    budget_2013 = seq_range(budget_2013, n = 8)
+    )
+
+
+aug_year <- augment(mod_year, newdata = grid, se_fit = TRUE)
+aug_year <- aug_year |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
+
+
+ggplot(data = aug_year, aes(x = budget_2013, y = .pi)) +
+  geom_line(aes(color = as.factor(imdb_rating)), linewidth = 1) +
+  facet_wrap(~ year) +
+  labs(y = "Probability of Passing Test")
+```

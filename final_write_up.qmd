@@ -1,7 +1,9 @@
 ---
 title: "Predicting Bechdel Test Results through Statistical Modeling"
 author: "Hailey Quintavalle"
-format: pdf
+format: 
+  pdf:
+    toc: true
 ---
 
 ```{r echo = F, warning = F, message = F}
@@ -10,19 +12,8 @@ library(tidyverse)
 basics_movies <- read_csv(here::here("data/basics_movies.csv"))
 ```
 
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
+
+
 \
 \
 \
@@ -95,35 +86,161 @@ The data used for the present analysis comes from a combination of multiple onli
 
 IMDb Non-Commercial Data set:
 
-```{r}
+```{r echo = F, warning = F, message = F}
 basics_movies |> 
-  select(tconst, titleType, primaryTitle, originalTitle,
-         isAdult, startYear, runtimeMinutes, genres) |>
-  head() ## |> pander::pander() 
-
-## test_df <- read_tsv(here::here("data/title.basics.tsv")) |>    # data downloaded from from IMDb website 
-##   mutate(imdbid = parse_number(tconst))
+  slice(10138:10143) |>
+  select(tconst, originalTitle,
+         startYear, runtimeMinutes, genres) |> 
+  knitr::kable() 
 ```
+
+The code manual for the data from IMDb: 
+
+ - **tconst**: alphanumeric unique identifier of the title
+ 
+ - **originalTitle**: title of the movie
+ 
+ - **startYear**: release year of the movie
+ 
+ - **runtimeMinutes**: runtime in minutes
+ 
+ - **genres**: up to three genres associated with the title
+ 
 
 
 Other data that was used in this analysis comes from the Bechdel Test Movie List, where users can submit movies with their Bechdel test rating through their online platform. The data set pulled from this website contains 10,251 movies with release dates ranging from 1874 to 2024. For the rating variable, a movie is given a rating from one to three, directly corresponding with the number of requirements of the Bechdel test that it passes. A preview of this data can be shown below.
 
-```{r message = F, warning = F}
+```{r message = F, warning = F, echo = F}
 movies_api <- read_csv("data/movies_api.csv")
-movies_api |> head()
+movies_api |> 
+  slice(10231:10236) |> 
+  knitr::kable() 
 ```
+
+The code manual for the Bechdel Test Movie List data:
+
+- **id**: ID number
+
+- **title**: title of the movie
+
+- **imdbid**: IMDb number ID
+
+- **year**: release year
+
+- **rating**: Bechdel Test rating (0-3)
+
 
 The final data set that was used in this analysis comes from the [TidyTuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-09/readme.md) social data project through GitHub. This data set contains 1,794 movies released from 1970 up to 2013.
 
 
-```{r message = F, warning = F}
-movies <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/movies.csv')
 
-movies |> select(-error) |> head()
+```{r message = F, warning = F, echo = F}
+movies <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-03-09/movies.csv')
 ```
 
 
+
+```{r echo = F}
+movies |> select(year, imdb, title, test, clean_test, binary, budget) |> 
+  slice(44:46) |>  knitr::kable() 
+
+movies |> select(domgross, intgross, code, budget_2013, domgross_2013, intgross_2013) |> 
+  slice(44:46) |>  knitr::kable() 
+
+movies |> select(period_code, decade_code, imdb_id, response, rated, language, runtime) |> 
+  slice(44:46) |>  knitr::kable() 
+
+movies |> select(plot) |> 
+  slice(44:46) |>  knitr::kable() 
+
+movies |> select(writer) |> 
+  slice(44:46) |>  knitr::kable()
+
+movies |> select(country, metascore, imdb_rating, director, released, imdb_votes) |> 
+  slice(44:46) |>  knitr::kable() 
+
+movies |> select(actors, genre, awards) |> 
+  slice(44:46) |>  knitr::kable() 
+```
+
+The code manual for the TidyTuesday data: 
+
+- **year**: release year
+
+- **imdb**: IMDb id
+
+- **title**: title of movie
+
+- **test**: Bechdel Test outcome
+
+- **clean_test**: Bechdel Test outcome (cleaned)
+
+- **binary**: binary Pass or Fail of the Bechdel Test
+
+- **budget**: budget as of release year
+
+- **domgross**: domestic gross in release year
+
+- **intgross**: international  gross in release year
+
+- **code**: code for movie    ###
+
+- **budget_2013**: budget normalized to 2013
+
+- **domgross_2013**: domestic gross normalized to 2013
+
+- **intgross_2013**: international gross normalized to 2013
+
+- **period_code**: period code   ###
+
+- **decade_code**: decade code
+
+- **imdb_id**: IMDb ID   ###
+
+- **plot**: plot summary of the movie
+
+- **rated**: content rating of movie
+
+- **response**: ???    ###
+
+- **language**: language of movie
+ 
+- **country**: country movie is produced in
+
+- **writer**: writer of the film
+
+- **metascore**: Metascore (critic) rating (0-100)
+
+- **imdb_rating**: IMDb (user) rating (0-10)
+
+- **director**: Director(s) of movie
+
+- **released**: released date
+
+- **actors**: main actors in movie
+
+- **genre**: genre
+
+- **awards**: awards won
+
+- **runtime**: runtime in minutes
+
+- **type**: type of film   ###
+
+- **imdb_votes**: number of IMDb votes
+
+
+## Exploratory Analysis
+
+
+
 # Modeling
+
+
+ 
+$$
+logit(\pi) = \beta_0 + \beta_1 \cdot \text{Budget} + \beta_2 \cdot \text{Year} + \beta_3 \cdot \text{IMDb Rating}
+$$
 
 
 Full model with all genres and all interactions: 
