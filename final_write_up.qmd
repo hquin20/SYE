@@ -422,9 +422,11 @@ genre_model <- glm(factor(binary) ~ year + Animation + Action + Adult +
 genre_model |> pander::pander(caption = "Logistic Model Coefficients")
 ```
 
-To understand the relationship between specific genres and likelihood of passing of the Bechdel Test, individual coefficients for selected genres can be interpreted. For example, the value of the coefficient for the genre adventure is -22.12. This means that when the genre of a movie is adventure, the log odds of passing the Bechdel Test decrease by 22.12 as compared to other genres. In other words, adventure movie have an overall lower likelihood of passing the test. However, as revealed by the interaction between adventure and release year, the opposite effect is observed. When accounting for release year, the log odds of passing the test increase by 0.011 when the movie is considered an adventure film. Both relationships are proven to be statistically significant. 
+To understand the relationship between specific genres and likelihood of passing of the Bechdel Test, individual coefficients for selected genres can be interpreted. For example, the value of the coefficient for the genre adventure is -22.12. This means that when the genre of a movie is adventure, the log odds of passing the Bechdel Test decrease by 22.12 as compared to other genres. In other words, adventure movie have an overall lower likelihood of passing the test. However, as revealed by the interaction between adventure and release year, the opposite effect is observed. When accounting for release year, the log odds of passing the test increase by 0.011 when the movie is considered an adventure film. Both relationships are proven to be statistically significant. These opposing effects may result from a majority of older adventure movies not passing the test combined with a smaller number of newer movies mostly passing the test. 
 
+Another genre that produces a similar result to this in the model is animated movies. The animated variable by itself suggests that the log odds of passing the Bechdel Test decrease by 24.18 when the movie is animated, compared to other genres. However, when considering the interaction between animation and release year, the effect is different. The log odds of passing the test is predicted to be 0.012 higher than that of the other genres when accounting for the year. Both relationships here also have evidence of statistical significance. 
 
+The following plots showcase these relationships well, along with the other genres included in the model. Each colored trend line represent a different movie genre, with year along the x-axis and the predicted probability of passing the Bechdel Test on the y-axis. Each plot contains a different group of genres. The genres were plotted on multiple graphs for clarity. 
 
 ```{r}
 aug_mod3 <- augment(genre_model, newdata = new_grid, se_fit = TRUE)
@@ -446,12 +448,11 @@ movies_fail <- movies_indi |> filter(binary == 0)
 ```
 
 
-The following plots 
 
 ```{r}
 list3 |> filter(values == 1, genre %in% 
                   c("Sport", "Comedy", "Romance", "Adventure",
-                    "Action", "Documentary", "War", "Western")) |> 
+                    "Documentary", "War", "Western")) |> 
   mutate(genre = fct_reorder2(genre, .x = year, .y = .pi)) |>
   ggplot(aes(x = year, y = .pi)) +                      
   geom_line(aes(color = genre), linewidth = 0.9) + 
@@ -473,6 +474,9 @@ list3 |> filter(values == 1, genre %in%
   scale_color_viridis_d()
 
 ```
+
+In the previous plot, the predicted probability of passing the test appears to be lower for genres such as war and western movies, and appears to be the highest for romance, adventure, and comedy movies. The strongest increase in predicted probability over time seems to be adventure movies, as the trend line begins close to 0 in the late 1800s and climbs to almost 75% in recent years. This observation aligns with the previous conclusions made about the interaction between the adventure genre and release year. 
+
 
 ```{r}
 list3 |> filter(values == 1, genre %in% 
@@ -500,10 +504,13 @@ list3 |> filter(values == 1, genre %in%
 
 ```
 
+This plot clearly demonstrates the relationship found between Bechdel Test results and animated movies, similar to that of the one seen in adventure movies. The trend line representing the animation genre appears to show the steepest climb of the genres presented in this visual, possibly signifying animated movies have seen a faster progression of including female roles in film over time than other genres included in this analysis. 
+
+
 ```{r}
 list3 |> filter(values == 1, genre %in% 
                   c("Thriller", "Biography", "Mystery", "History",
-                    "Short", "Talk-Show", "News", "Film-Noir")) |> 
+                    "Short", "Action")) |> 
   mutate(genre = fct_reorder2(genre, .x = year, .y = .pi)) |>
   ggplot(aes(x = year, y = .pi)) +                      
   geom_line(aes(color = genre), linewidth = 0.9) + 
@@ -524,6 +531,9 @@ list3 |> filter(values == 1, genre %in%
        title = "Different Genres Over Time") +
   scale_color_viridis_d()
 ```
+
+From this final plot it can be noted that the predicted probability of short films and action films have experienced a similar, but steep increase from the 1900s to today. The other genres included here show a steady increase of probability over time. 
+
 
 ## Rating Analysis
 
