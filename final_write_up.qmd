@@ -9,6 +9,8 @@ format:
 ```{r echo = F, warning = F, message = F}
 library(tinytex)
 library(tidyverse)
+library(modelr)
+library(broom)
 basics_movies <- read_csv(here::here("data/basics_movies.csv"))
 ```
 
@@ -105,7 +107,6 @@ The code manual for the data from IMDb:
  - **runtimeMinutes**: runtime in minutes
  
  - **genres**: up to three genres associated with the title
- 
 
 
 Other data that was used in this analysis comes from the Bechdel Test Movie List, where users can submit movies with their Bechdel test rating through their online platform. The data set pulled from this website contains 10,251 movies with release dates ranging from 1874 to 2024. For the rating variable, a movie is given a rating from one to three, directly corresponding with the number of requirements of the Bechdel test that it passes. A preview of this data can be shown below.
@@ -129,9 +130,9 @@ The code manual for the Bechdel Test Movie List data:
 
 - **rating**: Bechdel Test rating (0-3)
 
+The data from IMDb Non-Commercial Datasets was joined with the data set pulled from the Bechdel test movie list to be used in the final model concerning genres. 
 
 The final data set that was used in this analysis comes from the [TidyTuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-09/readme.md) social data project through GitHub. This data set contains 1,794 movies released from 1970 up to 2013.
-
 
 
 ```{r message = F, warning = F, echo = F}
@@ -230,52 +231,187 @@ The code manual for the TidyTuesday data:
 - **imdb_votes**: number of IMDb votes
 
 
-## Exploratory Analysis
+## Exploratory Overview
+
+
+Looking into the IMDb movie data set, the overall percentage of movies that pass the Bechdel Test is 57.0%, with the remaining 43.0% failing the test. The plot below demonstrates the proportion of movies each year that pass and fail the test each year, starting in 1930 up to 2023. The movies released in the years before 1930 have been excluded from this plot because of the amount of variation coming from a small number of movies each year, with an average of around 4 movies per year. 
+
+```{r warning = F, message = F}
+basics_movies |>
+  mutate(binary = if_else(rating == 3, "Pass", "Fail")) |>
+  select(year, binary) |>
+  group_by(year, binary) |>
+  summarise(n = n()) |>
+  filter(year >= 1930) |> 
+  pivot_wider(names_from = binary, values_from = n) |>
+  mutate(Pass = if_else(is.na(Pass), 0, Pass),
+         Fail = if_else(is.na(Fail), 0, Fail)) |>
+  mutate(total_movies = sum(Pass, Fail)) |>
+  mutate(Fail = Fail / total_movies,
+         Pass = Pass / total_movies) |>
+  pivot_longer(c(Fail, Pass), names_to = "binary", values_to = "prop") |>
+  ggplot(aes(x = year, y = prop)) +
+  geom_line(aes(color = binary), linewidth = 0.7) +
+  scale_color_viridis_d(name = "Test Outcome") +
+  labs(x = "Year",
+       y = "Proportion of Movies",
+       title = "Bechdel Test Outcome Over Time") +
+  theme_minimal()
+```
+
+As seen in this plot, the proportion of movies passing and failing the test has much variation from the 1930s up until the early 90s. After the early 90s, however, the difference between the proportion of those that pass and fail each year becomes much more prominent. The proportion of movies that are passing the Bechdel Test are increasing each year. 
+
+```{r}
+# movies appear multiple times for multiple listed genres
+movies_model <- basics_movies |> separate_rows(genres, sep = ",") 
+movies_model <- movies_model |> mutate(binary = if_else(rating == 3, "1", "0")) |> 
+  mutate(binary = as.numeric(binary)) |>
+  filter(!genres %in% c("News", "Adult", "Talk-Show", "\\N")) |>
+  relocate(binary)
+
+```
+
+[enter some visual about genres here?]
+
+Exploring the TidyTuesday data set allows us to examine other characteristics of movies, such as movie budget and different types of ratings. The plot below shpws the difference in critic ratings, or Metascore, between movies that pass and fail the Bechdel Test. 
+
+```{r message = F, warning = F}
+movies |>
+  ggplot(aes(x = binary, y = metascore)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(x = "Bechdel Test Outcome", 
+       y = "Metascore",
+       title = "Bechdel Test Rating and Critic Ratings")
+```
+
+The plot above suggests a slight increase in average Metascore ratings for the movies that do not pass the Bechdel Test, but the difference appears to be too small to be notable. Demonstrated in the following plot, movies that do not pass the Bechdel Test also appear to have higher average user ratings than movies that pass.
+
+
+```{r message = F, warning = F}
+movies |>
+  ggplot(aes(x = binary, y = imdb_rating)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(x = "Bechdel Test Outcome", 
+       y = "IMDb Rating",
+       title = "Bechdel Test Rating and User Ratings")
+```
+
+In terms of movie budget, it appears that movies that fail tend to show larger movie bugdets than movies that pass the test, as shown in the following plot. 
+
+```{r message = F, warning = F}
+movies |>
+  ggplot(aes(x = binary, y = budget_2013)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(x = "Bechdel Test Outcome", 
+       y = "Budget",
+       title = "Bechdel Test Rating and Movie Budget")
+```
+
+Another interesting variable in this data set is content rating. The content rating is designed to classify movies based on the audiences they are suitable for, based on factors like profanity, violence, sexual content, substance use, and any other topics that are not recommend for children to watch. The plot below contains five different content ratings with the proportion of movies that pass and fail the Bechdel Test in those categories. 
+
+
+```{r message = F, warning = F}
+movies |>
+  select(rated, binary) |>
+  group_by(rated, binary) |>
+  summarise(n = n()) |>
+  filter(n > 4) |>
+  pivot_wider(names_from = binary, values_from = n) |>
+  mutate(Pass = if_else(is.na(PASS), 0, PASS),
+         Fail = if_else(is.na(FAIL), 0, FAIL)) |>
+  mutate(total_movies = sum(Pass, Fail)) |>
+  mutate(Fail = Fail / total_movies,
+         Pass = Pass / total_movies) |>
+  pivot_longer(c(Fail, Pass), names_to = "binary", values_to = "prop") |>
+  filter(rated != "N/A") |>
+  ggplot(aes(x = rated, y = prop)) +
+  geom_col(aes(fill = binary), position = "stack") +
+  geom_hline(yintercept = 0.5, linewidth = 1.2, color = "lightseagreen") +
+  theme_minimal() +
+  labs(x = "Content Rating",
+       y = "Proportion of Movies",
+       title = "Bechdel Test Outcome and Content Rating") +
+  scale_fill_viridis_d(name = "Test Outcome")
+```
+
+The blue line represents the point of indifference, where the proportion of movies that pass is equal to 50%. The proportion of movies that pass the test does not reach half for any of the content rating categories, revealing that the majority of movies in each of these categories do not seem to pass. 
 
 
 
 # Modeling
 
-
- 
-$$
-logit(\pi) = \beta_0 + \beta_1 \cdot \text{Budget} + \beta_2 \cdot \text{Year} + \beta_3 \cdot \text{IMDb Rating}
-$$
+## Genre Analysis
 
 
 Full model with all genres and all interactions: 
+ 
+$$
+\text{logit}(\pi) = \beta_0 + \beta_1 \cdot \text{Year} + \beta_2 \cdot \text{Animation} + \beta_3 \cdot \text{Action} + \beta_4 \cdot \text{Adult} \\
++ \beta_5 \cdot \text{Adventure} + \beta_6 \cdot \text{Biography}
++ \beta_7 \cdot \text{Comedy} + \beta_8 \cdot \text{Crime} \\
++ \text{ } \beta_9 \cdot \text{Documentary} + \beta_{10} \cdot \text{Drama} + \beta_{11} \cdot \text{Family} + \beta_{12} \cdot \text{Fantasy} \\
++ \text{ } \beta_{13} \cdot \text{History} + \beta_{14} \cdot \text{Horror} + \beta_{15} \cdot \text{Music} + \beta_{16} \cdot \text{Musical} \\
++ \text{ } \beta_{17} \cdot \text{Mystery} + \beta_{18} \cdot \text{Romance} + \beta_{19} \cdot \text{Short} + \beta_{20} \cdot \text{Sport} \\
++ \text{ } \beta_{21} \cdot \text{Thriller} + \beta_{22} \cdot \text{War} + \beta_{23} \cdot \text{Western} \\
++ \text{ } \beta_{24} \cdot \text{Year:Animation} + \beta_{25} \cdot \text{Year:Action} + \beta_{26} \cdot \text{Year:Adult} \\
++ \text{ } \beta_{27} \cdot \text{Year:Adventure} + \beta_{28} \cdot \text{Year:Biography} + \beta_{29} \cdot \text{Year:Comedy} \\
++ \text{ } \beta_{30} \cdot \text{Year:Crime} + \beta_{31} \cdot \text{Year:Documentary} + \beta_{32} \cdot \text{Year:Drama} \\
++ \text{ } \beta_{33} \cdot \text{Year:Family} + \beta_{34} \cdot \text{Year:Fantasy} + \beta_{35} \cdot \text{Year:History} \\
++ \text{ } \beta_{36} \cdot \text{Year:Horror} + \beta_{37} \cdot \text{Year:Music} + \beta_{38} \cdot \text{Year:Musical} \\
++ \text{ } \beta_{39} \cdot \text{Year:Mystery} + \beta_{40} \cdot \text{Year:Romance} + \beta_{41} \cdot \text{Year:Short} \\
++ \text{ } \beta_{42} \cdot \text{Year:Sport} + \beta_{43} \cdot \text{Year:Thriller} + \beta_{44} \cdot \text{Year:War} + \beta_{45} \cdot \text{Year:Western}
+$$
 
-[insert model] ??why wont latex work here??
 
 
-```{r echo = F, message = F, warning = F, cache = T, out.width='100%'}
-library(tidyverse)
-movies_indi <- read_csv(here::here("data/movies_indicator.csv"))
+
+```{r message = F, warning = F, cache = T, out.width='100%'}
+## basics_movies with indicator variable for each genre
+movies_indi <- read_csv(here::here("data/movies_indicator.csv")) 
 
 new_grid <- read_csv(here::here("data/movies_grid1.csv"))
 library(modelr)
 library(broom)
 
-mod3 <- glm(factor(binary) ~ year + Animation + Action + Adult + Adventure +
-              Biography + Comedy + Crime + Documentary + Drama +
-              Family + Fantasy + History + Horror + Music +
-              Musical + Mystery + Romance + Short + Sport +
-              Thriller + War + Western +
-              year:Animation + year:Action + year:Adult + year:Adventure +
-              year:Biography + year:Comedy + year:Crime + year:Documentary + year:Drama +
-              year:Family + year:Fantasy + year:History + year:Horror + year:Music +
-              year:Musical + year:Mystery + year:Romance + year:Short + year:Sport +
-              year:Thriller + year:War + year:Western, 
-            family = "binomial", data = movies_indi)
+genre_model <- glm(factor(binary) ~ year + Animation + Action + Adult + 
+                     Adventure + Biography + Comedy + Crime + 
+                     Documentary + Drama + Family + Fantasy + 
+                     History + Horror + Music + Musical +
+                     Mystery + Romance + Short + Sport + 
+                     Thriller + War + Western + year:Animation + 
+                     year:Action + year:Adult + year:Adventure + 
+                     year:Biography + year:Comedy + year:Crime +
+                     year:Documentary + year:Drama + year:Family +
+                     year:Fantasy + year:History + year:Horror + 
+                     year:Music + year:Musical + year:Mystery + 
+                     year:Romance + year:Short + year:Sport + 
+                     year:Thriller + year:War + year:Western,
+                   family = "binomial", data = movies_indi)
+```
 
-aug_mod3 <- augment(mod3, newdata = new_grid, se_fit = TRUE)
+
+
+```{r}
+genre_model |> pander::pander(caption = "Model Coefficients")
+```
+
+
+```{r}
+aug_mod3 <- augment(genre_model, newdata = new_grid, se_fit = TRUE)
 
 aug_mod3 <- aug_mod3 |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
 
-list3 <- aug_mod3 |> pivot_longer(cols = c(Animation, Action, Adult, Adventure, Biography, Comedy, 
-                                           Crime, Documentary, Drama, Family, Fantasy, History, 
-                                           Horror, Music, Musical, Mystery, Romance, Short, 
-                                           Sport, Thriller, War, Western), names_to = "genre", 
+list3 <- aug_mod3 |> pivot_longer(cols = c(Animation, Action, Adult, 
+                                           Adventure, Biography, Comedy, 
+                                           Crime, Documentary, Drama, 
+                                           Family, Fantasy, History, 
+                                           Horror, Music, Musical, Mystery,
+                                           Romance, Short, 
+                                           Sport, Thriller, 
+                                           War, Western), names_to = "genre", 
                                   values_to = "values")
 
 movies_pass <- movies_indi |> filter(binary == 1)
@@ -284,18 +420,24 @@ movies_fail <- movies_indi |> filter(binary == 0)
 
 
 
-
-
 ```{r}
 list3 |> filter(values == 1, genre %in% 
-                  c("Sport", "Comedy", "Romance", "Adventure", "Action", "Documentary", "War", "Western")) |> 
+                  c("Sport", "Comedy", "Romance", "Adventure",
+                    "Action", "Documentary", "War", "Western")) |> 
   mutate(genre = fct_reorder2(genre, .x = year, .y = .pi)) |>
   ggplot(aes(x = year, y = .pi)) +                      
   geom_line(aes(color = genre), linewidth = 0.9) + 
-  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +  ## alpha = 0.4
-  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") +  
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) + 
-  theme_minimal(base_size = 11) +
+  geom_rug(data = movies_pass,
+           aes(x = year, 
+               y = as.numeric(binary)), 
+           sides = "t", alpha = 0.1) +
+  geom_rug(data = movies_fail,
+           aes(x = year, 
+               y = as.numeric(binary)), 
+           sides = "b") +  
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1),
+                     limits = c(0, 1)) + 
+  theme_minimal() +
   labs(x = "\nYear",
        y = "Probabilty of Passing\n", 
        color = "Genre",
@@ -303,6 +445,55 @@ list3 |> filter(values == 1, genre %in%
   scale_color_viridis_d()
 
 ```
+
+
+## Further Analysis
+
+
+```{r}
+movies <- movies %>% mutate(binary_0 = ifelse(binary == "PASS", 1, 0))
+
+mod_year <- glm(binary_0 ~  budget_2013 +
+                  year + 
+                  imdb_rating +                 
+                  metascore,                     
+                data = movies, family = "binomial") 
+```
+
+```{r}
+mod_year |> pander::pander(caption = "Model Coefficients")
+```
+
+
+```{r}
+grid <- movies |>
+  data_grid(
+    year = seq_range(year, n = 4),
+    binary_0 = c(0, 1),
+    imdb_rating = seq_range(imdb_rating, n = 6),
+    budget_2013 = median(movies$budget_2013, na.rm = T),
+    metascore = seq_range(metascore, n = 4)
+    )
+
+aug_year <- augment(mod_year, newdata = grid, se_fit = TRUE)
+aug_year <- aug_year |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted))) |> 
+  mutate(year = round(year, 0))
+```
+
+
+
+```{r}
+ggplot(data = aug_year, aes(x = metascore, y = .pi)) +
+  geom_line(aes(color = as.factor(round(imdb_rating))), linewidth = 1) +
+  facet_wrap(~ year) + 
+  labs(y = "Probability of Passing Test",
+       x = "Metascore", 
+       title = "Ratings and Budget Over Time") +
+  scale_color_viridis_d(name = "IMDB Rating") +
+  theme_minimal()
+```
+
+
 
 
 # Conclusion
@@ -313,7 +504,7 @@ list3 |> filter(values == 1, genre %in%
 
 # References
 
-1. Alison Bechdel, 1986. *Dykes to watch out for*. Firebrand Books.
+1. Bechdel, A. (1986). Dykes to watch out for. *Firebrand Books*.
 
 
 2. Lauzen, M. (2024). It’s a Man’s (Celluloid) World: Portrayals of female characters in the top grossing U.S. Films of 2023. *Center for the Study of Women in Television & Film*. https://womenintvfilm.sdsu.edu/its-a-mans-celluloid-world-portrayals-of-female-characters-in-the-top-grossing-u-s-films-of-2023/ 
