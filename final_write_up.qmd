@@ -422,17 +422,7 @@ genre_model <- glm(factor(binary) ~ year + Animation + Action + Adult +
 genre_model |> pander::pander(caption = "Logistic Model Coefficients")
 ```
 
- **Adventure**         -22.12       6.641       -3.331    0.0008664 
- 
-```{r}
-exp(-22.12)  ## adventure
-exp(0.01093) ## interaction between year and adventure
-```
-
-
-To understand the relationship between specific genres and predictability of the Bechdel Test, 
-
-However, as revealed by the interaction between the Adventure genre and release year, the opposite effect is observed. 
+To understand the relationship between specific genres and likelihood of passing of the Bechdel Test, individual coefficients for selected genres can be interpreted. For example, the value of the coefficient for the genre adventure is -22.12. This means that when the genre of a movie is adventure, the log odds of passing the Bechdel Test decrease by 22.12 as compared to other genres. In other words, adventure movie have an overall lower likelihood of passing the test. However, as revealed by the interaction between adventure and release year, the opposite effect is observed. When accounting for release year, the log odds of passing the test increase by 0.011 when the movie is considered an adventure film. Both relationships are proven to be statistically significant. 
 
 
 
@@ -564,10 +554,11 @@ mod_year |> pander::pander(caption = "Logistic Model Coefficients")
 
 Interpreting the coefficient values produced by the logistic regression can be helpful in understanding their relationship with Bechdel Test outcome. For example, the value of the coefficient for budget is -4.773e-09, indicating a negative relationship between budget and passing the Bechdel Test. In other words, movies with higher budgets tend to be less likely to pass the Bechdel Test. A seen by the very small p-value, this relationship reveals to be significant.
 
-Among the other predictors, IMDb rating and Metascore also demonstrate significant relationships when predicting Bechdel Test outcome. The model output reveals that when the IMDb rating of a movie increases by 1 point, the log odds of a movie passing the test decreases by 0.571. This signifies that movies that pass the Bechdel Test tend to have lower ratings on IMDb, confirming what was observed in the exploratory analysis. In contrast, the relationship between critic rating and Bechdel Test outcome appears to show the opposite effect. As the Metascore rating for a movie increases by 1 point, the log odds of a movie passing the test increases by 0.021, meaning that movies that pass the Bechdel Test are predicted to have higher critic ratings. 
+Among the other predictors, IMDb rating and Metascore also demonstrate significant relationships when predicting Bechdel Test outcome. The model output reveals that when the IMDb rating of a movie increases by 1 point, the log odds of a movie passing the test decreases by 0.571, when all other variables are held constant. This signifies that movies that pass the Bechdel Test tend to have lower ratings on IMDb, confirming what was observed in the exploratory analysis. In contrast, the relationship between critic rating and Bechdel Test outcome appears to show the opposite effect. As the Metascore rating for a movie increases by 1 point, the log odds of a movie passing the test increases by 0.021, meaning that movies that pass the Bechdel Test are predicted to have higher critic ratings. 
 
-The last predictor in this model is year, predicting that as the release year increases by 1, the log odds of passing the test increase by 0.0161. This demonstrates that newer movies are more likely to pass the test than older movies. This relationship is only approaching significance, but it was determined that year plays a crucial role when it comes the role women play in film, so it was kept in the model. 
+The last predictor in this model is year, predicting that as the release year increases by 1, the log odds of passing the test increase by 0.0161 as other variables are held constant. This demonstrates that newer movies are more likely to pass the test than older movies. This relationship is only approaching significance, but it was determined that year plays a crucial role when it comes the role women play in film, so it was kept in the model. 
 
+The following plot visualizes this model using year, Metascore, and IMDb ratings to predict the probability that a movie will pass the Bechdel Test. 
 
 ```{r}
 grid <- movies |>
@@ -597,10 +588,20 @@ ggplot(data = aug_year, aes(x = metascore, y = .pi)) +
   theme_minimal()
 ```
 
-
+From this plot we can observe how movies rated lower on IMDb tend to have a higher predicted probability of passing the test. This is shown through the different colored trend lines representing IMDb ratings, as lower lines representing lower ratings appear towards higher probabilities. Furthermore, the upward direction of the lines in the plot visualize how movies with higher critic ratings have a higher predicted probability of passing the Bechdel Test. Lastly, the plot is split into four different graphs to represent the change in probability over time. The difference appears to be small, but predicted probability increases when moving from past to present years. 
 
 
 # Conclusion
+
+Overall, this analysis was designed to investigate the Bechdel Test, a test created to assess the roles of women in film. 
+
+
+## Limitations
+
+
+
+
+## Future Work
 
 
 
