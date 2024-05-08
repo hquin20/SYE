@@ -345,28 +345,53 @@ The blue line represents the point of indifference, where the proportion of movi
 
 ## Genre Analysis
 
-
-Full model with all genres and all interactions: 
+The goal of this analysis is to determine which genres have a higher probability of passing the Bechdel Test, and how that trend varies over time. To do this, a logistic regression model was created to model this probability, using all genres provided by the data and their interactions with release year. The full model with all coefficients is shown below. This model was created using the data from the IMDb database and the Bechdel Test Movie List. 
  
 $$
 \text{logit}(\pi) = \beta_0 + \beta_1 \cdot \text{Year} + \beta_2 \cdot \text{Animation} + \beta_3 \cdot \text{Action} + \beta_4 \cdot \text{Adult} \\
+$$
+$$
 + \beta_5 \cdot \text{Adventure} + \beta_6 \cdot \text{Biography}
-+ \beta_7 \cdot \text{Comedy} + \beta_8 \cdot \text{Crime} \\
-+ \text{ } \beta_9 \cdot \text{Documentary} + \beta_{10} \cdot \text{Drama} + \beta_{11} \cdot \text{Family} + \beta_{12} \cdot \text{Fantasy} \\
-+ \text{ } \beta_{13} \cdot \text{History} + \beta_{14} \cdot \text{Horror} + \beta_{15} \cdot \text{Music} + \beta_{16} \cdot \text{Musical} \\
-+ \text{ } \beta_{17} \cdot \text{Mystery} + \beta_{18} \cdot \text{Romance} + \beta_{19} \cdot \text{Short} + \beta_{20} \cdot \text{Sport} \\
-+ \text{ } \beta_{21} \cdot \text{Thriller} + \beta_{22} \cdot \text{War} + \beta_{23} \cdot \text{Western} \\
-+ \text{ } \beta_{24} \cdot \text{Year:Animation} + \beta_{25} \cdot \text{Year:Action} + \beta_{26} \cdot \text{Year:Adult} \\
-+ \text{ } \beta_{27} \cdot \text{Year:Adventure} + \beta_{28} \cdot \text{Year:Biography} + \beta_{29} \cdot \text{Year:Comedy} \\
-+ \text{ } \beta_{30} \cdot \text{Year:Crime} + \beta_{31} \cdot \text{Year:Documentary} + \beta_{32} \cdot \text{Year:Drama} \\
-+ \text{ } \beta_{33} \cdot \text{Year:Family} + \beta_{34} \cdot \text{Year:Fantasy} + \beta_{35} \cdot \text{Year:History} \\
-+ \text{ } \beta_{36} \cdot \text{Year:Horror} + \beta_{37} \cdot \text{Year:Music} + \beta_{38} \cdot \text{Year:Musical} \\
-+ \text{ } \beta_{39} \cdot \text{Year:Mystery} + \beta_{40} \cdot \text{Year:Romance} + \beta_{41} \cdot \text{Year:Short} \\
-+ \text{ } \beta_{42} \cdot \text{Year:Sport} + \beta_{43} \cdot \text{Year:Thriller} + \beta_{44} \cdot \text{Year:War} + \beta_{45} \cdot \text{Year:Western}
++ \beta_7 \cdot \text{Comedy} + \beta_8 \cdot \text{Crime} 
++ \text{ } \beta_9 \cdot \text{Documentary}
+$$
+$$
+ + \beta_{10} \cdot \text{Drama} + \beta_{11} \cdot \text{Family} 
++ \beta_{12} \cdot \text{Fantasy} + \text{ } \beta_{13} \cdot \text{History} + \beta_{14} \cdot \text{Horror} 
+$$
+$$
++ \beta_{15} \cdot \text{Music} + 
+ \beta_{16} \cdot \text{Musical} + \text{ } \beta_{17} \cdot
+ \text{Mystery} + \beta_{18} \cdot \text{Romance} + \beta_{19} \cdot \text{Short} 
+$$
+$$
++ \beta_{20} \cdot \text{Sport} 
++ \text{ } \beta_{21} \cdot \text{Thriller} + \beta_{22} \cdot \text{War} + \beta_{23} \cdot \text{Western}
+$$
+$$
++ \text{ } \beta_{24} \cdot \text{Year:Animation} + \beta_{25} \cdot 
+\text{Year:Action} + \beta_{26} \cdot \text{Year:Adult} + \text{ } 
+\beta_{27} \cdot \text{Year:Adventure} 
+$$
+$$
++ \beta_{28} \cdot \text{Year:Biography} + \beta_{29} \cdot \text{Year:Comedy}
++ \text{ } \beta_{30} \cdot \text{Year:Crime} + \beta_{31} \cdot \text{Year:Documentary} 
+$$
+$$
++ \beta_{32} \cdot \text{Year:Drama} + \text{ } \beta_{33} \cdot \text{Year:Family} + \beta_{34} \cdot \text{Year:Fantasy} + \beta_{35} \cdot \text{Year:History} 
+$$
+$$
++ \text{ } \beta_{36} \cdot \text{Year:Horror} + \beta_{37} \cdot \text{Year:Music} + \beta_{38} \cdot \text{Year:Musical}+ \text{ } \beta_{39} \cdot \text{Year:Mystery} 
+$$
+$$
++ \beta_{40} \cdot \text{Year:Romance} + \beta_{41} \cdot \text{Year:Short}
++ \text{ } \beta_{42} \cdot \text{Year:Sport} + \beta_{43} \cdot \text{Year:Thriller} 
+$$
+$$
++ \beta_{44} \cdot \text{Year:War} + \beta_{45} \cdot \text{Year:Western}
 $$
 
-
-
+Within this model, $\pi$ represents the probability of passing the test and $logit$ represents the log odds of passing the test. Each genre in the present model is an indicator variable, with values 1 and 0, representing if the movie is that genre or not, respectively. For example, if a movie is an action film, the Action term in the model would be the value 1. If a different movie is entered in the model and not considered an action film, then the Action term would be 0. Interaction terms representing the changes in probability over time are included in the model for every genre as well. Each $\beta$ value with its statistical significance is shown in the table below. 
 
 ```{r message = F, warning = F, cache = T, out.width='100%'}
 ## basics_movies with indicator variable for each genre
@@ -393,9 +418,24 @@ genre_model <- glm(factor(binary) ~ year + Animation + Action + Adult +
 ```
 
 
+```{r echo = F}
+genre_model |> pander::pander(caption = "Logistic Model Coefficients")
+```
+
+ **Adventure**         -22.12       6.641       -3.331    0.0008664 
+ 
+```{r}
+exp(-22.12)  ## adventure
+exp(0.01093) ## interaction between year and adventure
+```
+
+
+To understand the relationship between specific genres and predictability of the Bechdel Test 
+
+
 
 ```{r}
-genre_model |> pander::pander(caption = "Model Coefficients")
+genre_model |> summary()
 ```
 
 
@@ -447,7 +487,7 @@ list3 |> filter(values == 1, genre %in%
 ```
 
 
-## Further Analysis
+## Rating Analysis
 
 
 ```{r}
@@ -460,7 +500,7 @@ mod_year <- glm(binary_0 ~  budget_2013 +
                 data = movies, family = "binomial") 
 ```
 
-```{r}
+```{r echo = F}
 mod_year |> pander::pander(caption = "Model Coefficients")
 ```
 
