@@ -4,6 +4,12 @@ author: "Hailey Quintavalle"
 format: 
   pdf:
     toc: true
+    include-in-header:
+        text: |
+          \usepackage{lipsum}
+          \usepackage{setspace}
+          \onehalfspacing
+          \linespread{2}
 ---
 
 ```{r echo = F, warning = F, message = F}
@@ -14,57 +20,25 @@ library(broom)
 basics_movies <- read_csv(here::here("data/basics_movies.csv"))
 ```
 
+```{r}
+#| label: setup
+#| include: false
 
+chunk_hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- chunk_hook(x, options)
+  paste0("\\linespread{0.9}\n", x, "\n\n\\linespread{2}")
+})
+```
 
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
+\pagebreak
 
 # Abstract 
 
 The Bechdel Test is a simple measurement designed to analyze the representation of women in film. To pass, a movie must have two female characters who have a conversation that is not about a man. The present research aims to use genre, release year, movie budget, user ratings, and critics rating scores to predict the probability a movie will pass the test. Logistic regression analysis reveals more recent movies are predicted to have a higher probability of passing the test. For most years, genres such as Romance and Comedy are predicted to have a higher probability of passing, while genres such as Action, Sport, War, and Western are predicted to have a lower probability of passing the test. Although the Bechdel Test has its flaws, the test is a useful metric to bring attention to the roles women hold in film. 
 
 
-
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-\
-
+\pagebreak
 
 
 # Introduction
@@ -109,7 +83,7 @@ The code manual for the data from IMDb:
  - **genres**: up to three genres associated with the title
 
 
-Other data that was used in this analysis comes from the Bechdel Test Movie List, where users can submit movies with their Bechdel test rating through their online platform. The data set pulled from this website contains 10,251 movies with release dates ranging from 1874 to 2024. For the rating variable, a movie is given a rating from one to three, directly corresponding with the number of requirements of the Bechdel test that it passes. A preview of this data can be shown below.
+Other data that was used in this analysis comes from the Bechdel Test Movie List, where users can submit movies with their Bechdel test rating through their online platform. The data set pulled from this website contains 10,251 movies with release dates ranging from 1874 to 2024. For the rating variable, a movie is given a rating from one to three, directly corresponding with the number of requirements of the Bechdel test that it passes. Only movies with a `3` for this variable fully pass the Bechdel test. A preview of this data can be shown below.
 
 ```{r message = F, warning = F, echo = F}
 movies_api <- read_csv("data/movies_api.csv")
@@ -148,7 +122,7 @@ movies |> select(year, imdb, title, test, clean_test, binary, budget) |>
 movies |> select(domgross, intgross, code, budget_2013, domgross_2013, intgross_2013) |> 
   slice(44:46) |>  knitr::kable() 
 
-movies |> select(period_code, decade_code, imdb_id, response, rated, language, runtime) |> 
+movies |> select(period_code, decade_code, imdb_id, rated, language, runtime, imdb_votes) |> 
   slice(44:46) |>  knitr::kable() 
 
 movies |> select(plot) |> 
@@ -157,7 +131,7 @@ movies |> select(plot) |>
 movies |> select(writer) |> 
   slice(44:46) |>  knitr::kable()
 
-movies |> select(country, metascore, imdb_rating, director, released, imdb_votes) |> 
+movies |> select(country, metascore, imdb_rating, director, released, type) |> 
   slice(44:46) |>  knitr::kable() 
 
 movies |> select(actors, genre, awards) |> 
@@ -184,7 +158,7 @@ The code manual for the TidyTuesday data:
 
 - **intgross**: international  gross in release year
 
-- **code**: code for movie    ###
+- **code**: code for movie
 
 - **budget_2013**: budget normalized to 2013
 
@@ -192,23 +166,23 @@ The code manual for the TidyTuesday data:
 
 - **intgross_2013**: international gross normalized to 2013
 
-- **period_code**: period code   ###
+- **period_code**: period code
 
 - **decade_code**: decade code
 
-- **imdb_id**: IMDb ID   ###
-
-- **plot**: plot summary of the movie
+- **imdb_id**: IMDb ID
 
 - **rated**: content rating of movie
 
-- **response**: ???    ###
-
 - **language**: language of movie
  
-- **country**: country movie is produced in
+- **runtime**: runtime in minutes
+
+- **plot**: plot summary of the movie
 
 - **writer**: writer of the film
+
+- **country**: country movie is produced in
 
 - **metascore**: Metascore (critic) rating (0-100)
 
@@ -218,23 +192,21 @@ The code manual for the TidyTuesday data:
 
 - **released**: released date
 
+- **imdb_votes**: number of IMDb votes
+
 - **actors**: main actors in movie
 
 - **genre**: genre
 
 - **awards**: awards won
 
-- **runtime**: runtime in minutes
-
-- **type**: type of film   ###
-
-- **imdb_votes**: number of IMDb votes
+- **type**: type of film
 
 
 ## Exploratory Overview
 
 
-Looking into the IMDb movie data set, the overall percentage of movies that pass the Bechdel Test is 57.0%, with the remaining 43.0% failing the test. The plot below demonstrates the proportion of movies each year that pass and fail the test each year, starting in 1930 up to 2023. The movies released in the years before 1930 have been excluded from this plot because of the amount of variation coming from a small number of movies each year, with an average of around 4 movies per year. 
+Looking into the IMDb movie data set, the overall percentage of movies that pass the Bechdel Test is 57.0%, with the remaining 43.0% failing the test. The plot below demonstrates the proportion of movies that pass and fail the test each year, starting in 1930 up to 2023. The movies released in the years before 1935 have been excluded from this plot because of the amount of variation coming from a small number of movies each year, with an average of around 4 movies per year. 
 
 ```{r warning = F, message = F}
 basics_movies |>
@@ -242,7 +214,7 @@ basics_movies |>
   select(year, binary) |>
   group_by(year, binary) |>
   summarise(n = n()) |>
-  filter(year >= 1930) |> 
+  filter(year >= 1935) |> 
   pivot_wider(names_from = binary, values_from = n) |>
   mutate(Pass = if_else(is.na(Pass), 0, Pass),
          Fail = if_else(is.na(Fail), 0, Fail)) |>
@@ -252,6 +224,7 @@ basics_movies |>
   pivot_longer(c(Fail, Pass), names_to = "binary", values_to = "prop") |>
   ggplot(aes(x = year, y = prop)) +
   geom_line(aes(color = binary), linewidth = 0.7) +
+  geom_smooth(aes(color = binary), se = F) +
   scale_color_viridis_d(name = "Test Outcome") +
   labs(x = "Year",
        y = "Proportion of Movies",
@@ -259,7 +232,9 @@ basics_movies |>
   theme_minimal()
 ```
 
-As seen in this plot, the proportion of movies passing and failing the test has much variation from the 1930s up until the early 90s. After the early 90s, however, the difference between the proportion of those that pass and fail each year becomes much more prominent. The proportion of movies that are passing the Bechdel Test are increasing each year. 
+As seen in this plot, the proportion of movies passing and failing the test has much variation from the 1930s up until the early 90s. The solid lines in the plot represent the average proportion of movies that pass and fail each year. From these lines it is apparent that a greater proportion of movies had failed every year until the early 90s. After this point, however, the proportion of movies that pass each year appears to grow at a steady rate.
+
+The following plot shows the proportion of films that pass and fail the Bechdel Test within each movie genre. The blue line represents the point of indifference where half of the movies pass and half fail. 
 
 ```{r}
 # movies appear multiple times for multiple listed genres
@@ -271,9 +246,38 @@ movies_model <- movies_model |> mutate(binary = if_else(rating == 3, "1", "0")) 
 
 ```
 
-[enter some visual about genres here?]
+```{r message = F, warning = F}
+basics_movies |>
+  mutate(binary = if_else(rating == 3, "Pass", "Fail")) |>
+  separate_rows(genres, sep = ",") |>
+  select(genres, binary) |>
+  group_by(genres, binary) |>
+  summarise(n = n()) |>
+  filter(n > 4) |>
+  pivot_wider(names_from = binary, values_from = n) |>
+  mutate(Pass = if_else(is.na(Pass), 0, Pass),
+         Fail = if_else(is.na(Fail), 0, Fail)) |>
+  mutate(total_movies = sum(Pass, Fail)) |>
+  mutate(Fail = Fail / total_movies,
+         Pass = Pass / total_movies) |>
+  pivot_longer(c(Fail, Pass), names_to = "binary", values_to = "prop") |>
+  filter(genres != "NA",
+         genres != "Film-Noir",
+         genres != "Adult") |>
+  ggplot(aes(x = genres, y = prop)) +
+  geom_col(aes(fill = binary), position = "stack") +
+  geom_hline(yintercept = 0.5, linewidth = 1.2, color = "lightseagreen") +
+  theme_minimal() +
+  labs(x = "Genres",
+       y = "Proportion of Movies",
+       title = "Bechdel Test Outcome in Each Genre") +
+  scale_fill_viridis_d(name = "Test Outcome") +
+  coord_flip()
+```
 
-Exploring the TidyTuesday data set allows us to examine other characteristics of movies, such as movie budget and different types of ratings. The plot below shpws the difference in critic ratings, or Metascore, between movies that pass and fail the Bechdel Test. 
+As can be seen from this plot, most genres tend to have a higher proportion of movies that pass the test, with few genres falling far below 50%. 
+
+Exploring the TidyTuesday data set allows us to examine other characteristics of movies, such as movie budget and different types of ratings. The plot below shows the difference in critic ratings, or Metascore, between movies that pass and fail the Bechdel Test. 
 
 ```{r message = F, warning = F}
 movies |>
@@ -391,7 +395,7 @@ $$
 + \beta_{44} \cdot \text{Year:War} + \beta_{45} \cdot \text{Year:Western}
 $$
 
-Within this model, $\pi$ represents the probability of passing the test and $logit$ represents the log odds of passing the test. Each genre in the present model is an indicator variable, with values 1 and 0 representing if the movie is that genre or not, respectively. For example, if a movie is an action film, the Action term in the model would be the value 1. If a different movie is entered in the model and not considered an action film, then the Action term would be 0. Interaction terms representing the changes in probability over time are included in the model for every genre as well. Each $\beta$ value with its statistical significance is shown in the table below. 
+Within this model, $\pi$ represents the probability of passing the test and $logit(\pi)$ represents the log odds of passing the test. Each genre in the present model is an indicator variable, with values 1 and 0 representing if the movie is that genre or not, respectively. For example, if a movie is an action film, the Action term in the model would be the value 1. If a different movie is entered in the model and not considered an action film, then the Action term would be 0. Interaction terms allow for the association between the log odds of passing the test and time to be different for different genres. Each $\beta$ value with its statistical significance is shown in the table below. 
 
 ```{r message = F, warning = F, cache = T, out.width='100%'}
 ## basics_movies with indicator variable for each genre
@@ -422,11 +426,13 @@ genre_model <- glm(factor(binary) ~ year + Animation + Action + Adult +
 genre_model |> pander::pander(caption = "Logistic Model Coefficients")
 ```
 
-To understand the relationship between specific genres and likelihood of passing of the Bechdel Test, individual coefficients for selected genres can be interpreted. For example, the value of the coefficient for the genre adventure is -22.12. This means that when the genre of a movie is adventure, the log odds of passing the Bechdel Test decrease by 22.12 as compared to other genres. In other words, adventure movie have an overall lower likelihood of passing the test. However, as revealed by the interaction between adventure and release year, the opposite effect is observed. When accounting for release year, the log odds of passing the test increase by 0.011 when the movie is considered an adventure film. Both relationships are proven to be statistically significant. These opposing effects may result from a majority of older adventure movies not passing the test combined with a smaller number of newer movies mostly passing the test. 
+```{r}
+0.01908 + -0.01187
+```
 
-Another genre that produces a similar result to this in the model is animated movies. The animated variable by itself suggests that the log odds of passing the Bechdel Test decrease by 24.18 when the movie is animated, compared to other genres. However, when considering the interaction between animation and release year, the effect is different. The log odds of passing the test is predicted to be 0.012 higher than that of the other genres when accounting for the year. Both relationships here also have evidence of statistical significance. 
+To understand the relationship between specific genres and likelihood of passing of the Bechdel Test, individual coefficients for selected genres can be interpreted. For a one year increase in release year, the log odds is predicted to increase by 0.030 (0.01908 + 0.01093 = 0.03001) when the movie is considered an adventure film. This relationship has been proven to be statistically significant, with a p-value of 0.001. For animated movies, a one year increase in release year means the log odds is predicted to increase by 0.031 (0.01908 + 0.01204 = 0.031), with a p-value of 0.028. For western movies, a one year increase in release year results in a predicted 0.007 (0.01908 - 0.01187 = 0.00721) increase in log odds, a much slower rate than most other movie genres. 
 
-The following plots showcase these relationships well, along with the other genres included in the model. Each colored trend line represent a different movie genre, with year along the x-axis and the predicted probability of passing the Bechdel Test on the y-axis. Each plot contains a different group of genres. The genres were plotted on multiple graphs for clarity. 
+The following plots showcase these relationships well, along with the other genres included in the model. Each colored trend line represent a different movie genre, with year along the x-axis and the predicted probability of passing the Bechdel Test on the y-axis. The tick marks along the top and bottom of the plots represent the movies that pass and fail each year respectively. Each plot contains a different group of genres. The genres were plotted on multiple graphs for clarity. 
 
 ```{r}
 aug_mod3 <- augment(genre_model, newdata = new_grid, se_fit = TRUE)
@@ -463,7 +469,7 @@ list3 |> filter(values == 1, genre %in%
   geom_rug(data = movies_fail,
            aes(x = year, 
                y = as.numeric(binary)), 
-           sides = "b") +  
+           sides = "b", alpha = 0.1) +  
   scale_y_continuous(breaks = seq(0, 1, by = 0.1),
                      limits = c(0, 1)) + 
   theme_minimal() +
@@ -472,10 +478,9 @@ list3 |> filter(values == 1, genre %in%
        color = "Genre",
        title = "Different Genres Over Time") +
   scale_color_viridis_d()
-
 ```
 
-In the previous plot, the predicted probability of passing the test appears to be lower for genres such as war and western movies, and appears to be the highest for romance, adventure, and comedy movies. The strongest increase in predicted probability over time seems to be adventure movies, as the trend line begins close to 0 in the late 1800s and climbs to almost 75% in recent years. This observation aligns with the previous conclusions made about the interaction between the adventure genre and release year. 
+In the previous plot, the predicted probability of passing the test appears to be lower for genres such as war and western movies, and appears to be the highest for romance, adventure, and comedy movies. The strongest increase in predicted probability over time seems to be adventure movies, as the trend line begins close to 0 in the late 1800s and climbs to almost 75% in recent years.
 
 
 ```{r}
@@ -492,7 +497,7 @@ list3 |> filter(values == 1, genre %in%
   geom_rug(data = movies_fail,
            aes(x = year, 
                y = as.numeric(binary)), 
-           sides = "b") +  
+           sides = "b", alpha = 0.1) +  
   scale_y_continuous(breaks = seq(0, 1, by = 0.1),
                      limits = c(0, 1)) + 
   theme_minimal() +
@@ -521,7 +526,7 @@ list3 |> filter(values == 1, genre %in%
   geom_rug(data = movies_fail,
            aes(x = year, 
                y = as.numeric(binary)), 
-           sides = "b") +  
+           sides = "b", alpha = 0.1) +  
   scale_y_continuous(breaks = seq(0, 1, by = 0.1),
                      limits = c(0, 1)) + 
   theme_minimal() +
@@ -545,7 +550,7 @@ $$
 logit(\pi) = \beta_0 + \beta_1 \cdot \text{Budget} + \beta_2 \cdot \text{Year} + \beta_3 \cdot \text{IMDb Rating} +  \text{ } \beta_4 \cdot \text{Metascore}
 $$
 
-Similar to the model created in the previous section, $\pi$ represents the probability of passing the Bechdel Test and $logit$ represents the log odds of passing the test. The $\beta$ values of this model with the statistical significance for each is shown in the table below. 
+Similar to the model created in the previous section, $\pi$ represents the probability of passing the Bechdel Test and $logit(\pi)$ represents the log odds of passing the test. The $\beta$ values of this model with the statistical significance for each is shown in the table below. 
 
 
 ```{r}
@@ -562,11 +567,17 @@ mod_year <- glm(binary_0 ~  budget_2013 +
 mod_year |> pander::pander(caption = "Logistic Model Coefficients")
 ```
 
+```{r}
+-29.56 + -0.000000004733
+```
+
+
+
 Interpreting the coefficient values produced by the logistic regression can be helpful in understanding their relationship with Bechdel Test outcome. For example, the value of the coefficient for budget is -4.773e-09, indicating a negative relationship between budget and passing the Bechdel Test. In other words, movies with higher budgets tend to be less likely to pass the Bechdel Test. A seen by the very small p-value, this relationship reveals to be significant.
 
 Among the other predictors, IMDb rating and Metascore also demonstrate significant relationships when predicting Bechdel Test outcome. The model output reveals that when the IMDb rating of a movie increases by 1 point, the log odds of a movie passing the test decreases by 0.571, when all other variables are held constant. This signifies that movies that pass the Bechdel Test tend to have lower ratings on IMDb, confirming what was observed in the exploratory analysis. In contrast, the relationship between critic rating and Bechdel Test outcome appears to show the opposite effect. As the Metascore rating for a movie increases by 1 point, the log odds of a movie passing the test increases by 0.021, meaning that movies that pass the Bechdel Test are predicted to have higher critic ratings. 
 
-The last predictor in this model is year, predicting that as the release year increases by 1, the log odds of passing the test increase by 0.0161 as other variables are held constant. This demonstrates that newer movies are more likely to pass the test than older movies. This relationship is only approaching significance, but it was determined that year plays a crucial role when it comes the role women play in film, so it was kept in the model. 
+The last predictor in this model is year, predicting that as the release year increases by 1, the log odds of passing the test increase by 0.0161 as other variables are held constant. This demonstrates that newer movies are more likely to pass the test than older movies.
 
 The following plot visualizes this model using year, Metascore, and IMDb ratings to predict the probability that a movie will pass the Bechdel Test. 
 
@@ -613,7 +624,7 @@ One limitation of the present study is that the data used for the ratings analys
 
 ## Future Work
 
-Exploring additional variables beyond those examined in the current analysis could provide deeper insights into the determinants of Bechdel Test outcomes. For instance, future research might consider factors such as content rating, the number of awards and nominations received by a film, or characteristics of the director, including gender. Additionally, alternative metrics for assessing women's representation in film, such as the number of lines spoken by female characters or the presence of female protagonists, could offer alternative perspectives. As women's roles in film evolve, it's crucial for those responsible to be held accountable for their inclusion. Research such as the present analysis helps raise awareness of the presence of women and advocating for meaningful progress within the film industry. 
+Exploring additional variables beyond those examined in the current analysis could provide deeper insights into the determinants of Bechdel Test outcomes. For instance, future research might consider factors such as content rating, the number of awards and nominations received by a film, or characteristics of the director, including gender. Additionally, alternative metrics for assessing women's representation in film, such as the number of lines spoken by female characters or the presence of female protagonists, could offer alternative perspectives. As women's roles in film evolve, it's crucial for those responsible to be held accountable for their inclusion. Research such as the present analysis helps to raise awareness of the presence of women and advocate for meaningful progress within the film industry. 
 
 
 # References
