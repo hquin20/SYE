@@ -538,7 +538,7 @@ From this final plot it can be noted that the predicted probability of short fil
 ## Rating Analysis
 
 
-Since the TidyTuesday data contained a variety of movie characteristics that is not provided by IMDb or the Bechdel Test Movie List, a logistic regression model was constructed to investigate the effects of movie budget, year, IMDb rating, and Metascore rating on a movie's likelihood of passing the Bechdel Test. The full model with all coefficients is shown below. The cost of the budget has been normalized to 2013, as this is where the data set ends. 
+Since the TidyTuesday data contained a variety of movie characteristics that is not provided by IMDb or the Bechdel Test Movie List, it was used in a logistic regression model constructed to investigate the effects of movie budget, year, IMDb rating, and Metascore rating on a movie's likelihood of passing the Bechdel Test. The full model with all coefficients is shown below. The cost of the budget has been normalized to 2013, as this is where the data set ends. 
 
 
 $$
@@ -603,18 +603,17 @@ From this plot we can observe how movies rated lower on IMDb tend to have a high
 
 # Conclusion
 
-Overall, this analysis was designed to investigate the Bechdel Test, a test created to assess the roles of women in film. 
+Overall, this analysis was designed to investigate the Bechdel Test, a test created to assess the roles of women in film. To pass this test a movie needs to have two named female characters who have a conversation that is not about a man. Characteristics that were included in this analysis were genre, release year, IMDb rating, Metascore, and movie budget. Within the genre analysis it was found that some genres are predicted to pass the test across time more than other genres such as romance, adventure, and comedy movies. Movies genres that had the least predicted probability of passing included sport, western, and war movies. Further analysis concluded that movies with lower budgets have a higher predicted probability of passing the Bechdel Test. Movies with lower user ratings through IMDb were also more likely to pass the Bechdel Test, but movies with higher critic ratings were more likely to pass the test. 
 
 
 ## Limitations
 
-
+One limitation of the present study is that the data used for the ratings analysis only contained movies up to 2013, so conclusions about movie budget and ratings from 2013 to 2023 were unable to be drawn. Additionally, it should be noted that the Bechdel Test Movie List consists of movies reported by online users, and therefore may contain the most popular films that are most likely to be reported. 
 
 
 ## Future Work
 
-
-
+Exploring additional variables beyond those examined in the current analysis could provide deeper insights into the determinants of Bechdel Test outcomes. For instance, future research might consider factors such as content rating, the number of awards and nominations received by a film, or characteristics of the director, including gender. Additionally, alternative metrics for assessing women's representation in film, such as the number of lines spoken by female characters or the presence of female protagonists, could offer alternative perspectives. As women's roles in film evolve, it's crucial for those responsible to be held accountable for their inclusion. Research such as the present analysis helps raise awareness of the presence of women and advocating for meaningful progress within the film industry. 
 
 
 # References
