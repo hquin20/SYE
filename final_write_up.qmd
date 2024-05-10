@@ -43,17 +43,13 @@ The Bechdel Test is a simple measurement designed to analyze the representation 
 
 # Introduction
 
-If you think of your all-time favorite movie, try to think about how many of the main characters were women. In 2023, 35% of speaking roles in movies belonged to women, and only 28% of the top grossing films contained female protagonists (Lauzen, 2024). Just one decade before, in 2013, women occupied 30% of all speaking roles and just 15% of protagonists were women (Lauzen, 2014). This is a small change for a span of 10 years, showcasing the underrepresentation of women in film, and the slow steps towards progress the film industry seems to be taking. As we examine the portrayal of women's roles in film, it is useful to explore various criteria used to measure their representation. One notable measure is the Bechdel Test, unintentionally introduced by American cartoonist Alison Bechdel in 1986, and the primary measure of women in film that is the focus of the present analysis. 
+If you think of your all-time favorite movie, try to think about how many of the main characters were women. In 2023, 35% of all speaking roles in movies belonged to women, and only 28% of the top grossing films contained female protagonists (Lauzen, 2024). Just one decade before, in 2013, women occupied 30% of all speaking roles and just 15% of protagonists were women (Lauzen, 2014). This is a small change for a span of 10 years, showcasing the underrepresentation of women in film, and the slow steps towards progress the film industry seems to be taking. As we examine the portrayal of women's roles in film, it is useful to explore various criteria used to measure their representation. One notable measure is the Bechdel Test, unintentionally introduced by American cartoonist Alison Bechdel in 1986, and the primary measure of women in film that is the focus of the present analysis. 
 
 The Bechdel Test originated from a comic strip titled "The Rule", a part of her comic *Dykes To Watch Out For*. The comic depicts two women discussing certain criteria necessary for them to watch a movie. The criteria for a movie included: two named women, who talked to each other, and held a conversation with each other that was not about a man. In the early 2000s, the test quickly gained popularity online and has since been used as a common tool for analyzing the role of women in film. 
 
 The test has only three basic requirements, meaning that a film can pass with just one line. Because of the simplicity of this tool, many have come forward with fair criticisms of the test. For example, the test does not take into account demographic factors, such as age, the voices of women of color, or those who do not speak English as their first language (O’Meara, 2016). Other flaws of the test include the oversight of conversations that are not directly about a man, but may be indirectly about them, where the conclusion of the test are unclear. 
 
 Regardless of its flaws, the Bechdel Test is a straightforward and easy tool that allows people to quickly make base assumptions about the presence of women in film. For this reason, this analysis will be examining the characteristics of thousands of movies in an attempt to use logistic regression analysis to model the likelihood of passing the Bechdel Test.
-
-
-Read the comic [here](https://lithub.com/read-the-1985-comic-strip-that-inspired-the-bechdel-test/).
-
 
 
 ## Data
@@ -64,7 +60,7 @@ IMDb Non-Commercial Data set:
 
 ```{r echo = F, warning = F, message = F}
 basics_movies |> 
-  slice(10138:10143) |>
+  slice(10138:10142) |>
   select(tconst, originalTitle,
          startYear, runtimeMinutes, genres) |> 
   knitr::kable() 
@@ -158,7 +154,7 @@ The code manual for the TidyTuesday data:
 
 - **intgross**: international  gross in release year
 
-- **code**: code for movie
+- **code**: code for movie; contains year and Bechdel Test result
 
 - **budget_2013**: budget normalized to 2013
 
@@ -223,7 +219,7 @@ basics_movies |>
          Pass = Pass / total_movies) |>
   pivot_longer(c(Fail, Pass), names_to = "binary", values_to = "prop") |>
   ggplot(aes(x = year, y = prop)) +
-  geom_line(aes(color = binary), linewidth = 0.7) +
+  geom_line(aes(color = binary), linewidth = 0.7, alpha = 0.7) +
   geom_smooth(aes(color = binary), se = F) +
   scale_color_viridis_d(name = "Test Outcome") +
   labs(x = "Year",
@@ -556,10 +552,10 @@ Similar to the model created in the previous section, $\pi$ represents the proba
 ```{r}
 movies <- movies %>% mutate(binary_0 = ifelse(binary == "PASS", 1, 0))
 
-mod_year <- glm(binary_0 ~  budget_2013 + 
+mod_year <-  glm(binary_0 ~  budget_2013 +
                   year + 
-                  imdb_rating + 
-                  metascore,
+                  imdb_rating +                 
+                  metascore,                     
                 data = movies, family = "binomial") 
 ```
 
@@ -567,17 +563,11 @@ mod_year <- glm(binary_0 ~  budget_2013 +
 mod_year |> pander::pander(caption = "Logistic Model Coefficients")
 ```
 
-```{r}
--29.56 + -0.000000004733
-```
+Interpreting the coefficient values produced by the logistic regression can be helpful in understanding their relationship with Bechdel Test outcome. For example, the value of the coefficient for budget is -6.397e-09, indicating a negative relationship between budget and passing the Bechdel Test. In other words, movies with higher budgets tend to be less likely to pass the Bechdel Test. A seen by the very small p-value, this relationship reveals to be significant.
 
+Among the other predictors, IMDb rating and Metascore also demonstrate significant relationships when predicting Bechdel Test outcome. The model output reveals that when the IMDb rating of a movie increases by 1 point, the log odds of a movie passing the test decreases by 0.562, when all other variables are held constant. This signifies that movies that pass the Bechdel Test tend to have lower ratings on IMDb, confirming what was observed in the exploratory analysis. In contrast, the relationship between critic rating and Bechdel Test outcome appears to show the opposite effect. As the Metascore rating for a movie increases by 1 point, the log odds of a movie passing the test increases by 0.017, meaning that movies that pass the Bechdel Test are predicted to have higher critic ratings. 
 
-
-Interpreting the coefficient values produced by the logistic regression can be helpful in understanding their relationship with Bechdel Test outcome. For example, the value of the coefficient for budget is -4.773e-09, indicating a negative relationship between budget and passing the Bechdel Test. In other words, movies with higher budgets tend to be less likely to pass the Bechdel Test. A seen by the very small p-value, this relationship reveals to be significant.
-
-Among the other predictors, IMDb rating and Metascore also demonstrate significant relationships when predicting Bechdel Test outcome. The model output reveals that when the IMDb rating of a movie increases by 1 point, the log odds of a movie passing the test decreases by 0.571, when all other variables are held constant. This signifies that movies that pass the Bechdel Test tend to have lower ratings on IMDb, confirming what was observed in the exploratory analysis. In contrast, the relationship between critic rating and Bechdel Test outcome appears to show the opposite effect. As the Metascore rating for a movie increases by 1 point, the log odds of a movie passing the test increases by 0.021, meaning that movies that pass the Bechdel Test are predicted to have higher critic ratings. 
-
-The last predictor in this model is year, predicting that as the release year increases by 1, the log odds of passing the test increase by 0.0161 as other variables are held constant. This demonstrates that newer movies are more likely to pass the test than older movies.
+The last predictor in this model is year, predicting that as the release year increases by 1, the log odds of passing the test increase by 0.015 as other variables are held constant. This demonstrates that newer movies are more likely to pass the test than older movies.
 
 The following plot visualizes this model using year, Metascore, and IMDb ratings to predict the probability that a movie will pass the Bechdel Test. 
 
