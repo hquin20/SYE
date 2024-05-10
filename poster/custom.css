@@ -1,0 +1,16 @@
+---
+title: "CSS"
+output: html_document
+---
+
+
+/* custom.css */
+
+/* Adjust the position of the comic.png image */
+#logoright {
+  position: absolute;
+  top: 50px; /* Adjust the top position as needed */
+  left: 50px; /* Adjust the left position as needed */
+}
+
+

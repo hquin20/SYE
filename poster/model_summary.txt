@@ -1,0 +1,72 @@
+
+Call:
+glm(formula = factor(binary) ~ year + Animation + Action + Adult + 
+    Adventure + Biography + Comedy + Crime + Documentary + Drama + 
+    Family + Fantasy + History + Horror + Music + Musical + Mystery + 
+    Romance + Short + Sport + Thriller + War + Western + year:Animation + 
+    year:Action + year:Adult + year:Adventure + year:Biography + 
+    year:Comedy + year:Crime + year:Documentary + year:Drama + 
+    year:Family + year:Fantasy + year:History + year:Horror + 
+    year:Music + year:Musical + year:Mystery + year:Romance + 
+    year:Short + year:Sport + year:Thriller + year:War + year:Western, 
+    family = "binomial", data = movies_indi)
+
+Coefficients:
+                   Estimate Std. Error z value Pr(>|z|)    
+(Intercept)      -3.756e+01  6.867e+00  -5.471 4.48e-08 ***
+year              1.908e-02  3.440e-03   5.546 2.92e-08 ***
+Animation        -2.418e+01  1.100e+01  -2.198 0.027975 *  
+Action           -1.597e+01  7.381e+00  -2.164 0.030456 *  
+Adult             3.148e+01  1.875e+04   0.002 0.998660    
+Adventure        -2.212e+01  6.641e+00  -3.331 0.000866 ***
+Biography         5.874e+00  9.814e+00   0.599 0.549499    
+Comedy            7.334e+00  4.872e+00   1.505 0.132217    
+Crime             1.373e+01  5.736e+00   2.393 0.016700 *  
+Documentary      -6.955e+00  1.951e+01  -0.356 0.721547    
+Drama             1.029e+01  5.026e+00   2.048 0.040590 *  
+Family            1.427e+00  8.118e+00   0.176 0.860437    
+Fantasy          -2.324e+00  7.531e+00  -0.309 0.757626    
+History           2.483e+00  1.003e+01   0.247 0.804559    
+Horror           -4.725e+00  6.937e+00  -0.681 0.495818    
+Music             2.424e+00  1.214e+01   0.200 0.841738    
+Musical           4.900e+00  1.015e+01   0.483 0.629193    
+Mystery           8.571e+00  7.066e+00   1.213 0.225134    
+Romance           5.439e+00  4.928e+00   1.104 0.269700    
+Short            -2.670e+01  1.390e+01  -1.921 0.054694 .  
+Sport            -1.528e+01  2.104e+01  -0.726 0.467642    
+Thriller          1.038e+01  6.921e+00   1.500 0.133588    
+War               2.650e+01  1.091e+01   2.429 0.015137 *  
+Western           2.196e+01  1.845e+01   1.190 0.233949    
+year:Animation    1.204e-02  5.490e-03   2.192 0.028353 *  
+year:Action       7.626e-03  3.685e-03   2.069 0.038534 *  
+year:Adult       -9.716e-03  9.432e+00  -0.001 0.999178    
+year:Adventure    1.093e-02  3.322e-03   3.291 0.000997 ***
+year:Biography   -3.053e-03  4.901e-03  -0.623 0.533337    
+year:Comedy      -3.677e-03  2.439e-03  -1.508 0.131577    
+year:Crime       -7.114e-03  2.871e-03  -2.478 0.013212 *  
+year:Documentary  3.333e-03  9.739e-03   0.342 0.732224    
+year:Drama       -5.127e-03  2.516e-03  -2.037 0.041600 *  
+year:Family      -5.071e-04  4.068e-03  -0.125 0.900797    
+year:Fantasy      1.091e-03  3.769e-03   0.290 0.772141    
+year:History     -1.418e-03  5.022e-03  -0.282 0.777687    
+year:Horror       2.513e-03  3.472e-03   0.724 0.469187    
+year:Music       -1.224e-03  6.075e-03  -0.201 0.840341    
+year:Musical     -2.443e-03  5.126e-03  -0.477 0.633617    
+year:Mystery     -4.260e-03  3.536e-03  -1.205 0.228266    
+year:Romance     -2.575e-03  2.473e-03  -1.041 0.297748    
+year:Short        1.270e-02  6.953e-03   1.827 0.067752 .  
+year:Sport        7.197e-03  1.051e-02   0.685 0.493549    
+year:Thriller    -5.301e-03  3.461e-03  -1.532 0.125582    
+year:War         -1.378e-02  5.508e-03  -2.502 0.012365 *  
+year:Western     -1.187e-02  9.348e-03  -1.270 0.204078    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 13906  on 10177  degrees of freedom
+Residual deviance: 12843  on 10132  degrees of freedom
+AIC: 12935
+
+Number of Fisher Scoring iterations: 11
+
