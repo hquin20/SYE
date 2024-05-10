@@ -22,7 +22,7 @@ As we examine the portrayal of women's roles in film, it is useful to explore va
 
 The final data set used in the analysis was available through [IMDb Non-Commercial Datasets](https://developer.imdb.com/non-commercial-datasets/) and the [Bechdel Test Movie List](https://bechdeltest.com/), containing 10,183 movie titles released from 1874 to 2023. 
 
-```{r}
+```{r echo = F}
 basics_movies |> 
   slice(10138:10142) |>
   select(tconst, originalTitle,
@@ -47,12 +47,12 @@ The code manual for the data from IMDb:
 
 Other data used comes from the TidyTuesday social data project through GitHub, found [here](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-09/readme.md). 
 
-```{r}
+```{r echo = F}
 movies |> select(title, year, imdb_rating, metascore, budget_2013, binary) |> 
   slice(44:46) |>  knitr::kable() 
 ```
 
-The code manual for the TidyTuesday data: 
+The code manual for the TidyTuesday repository: 
 
 - **year**: release year
 
@@ -66,9 +66,139 @@ The code manual for the TidyTuesday data:
 
 - **imdb_rating**: IMDb (user) rating (0-10)
 
-data + table(s)
 
-one plot for each 
+## Genres Model
+
+
+$$
+logit(\pi) = \beta_0 + \beta_1 \cdot Year + \beta_2 \cdot \text{Animation} + \beta_3 \cdot \text{Action} + \beta_4 \cdot \text{Adult} + \text{ } \beta_5 \cdot \text{Adventure} +\ldots + \beta_{29} \cdot \text{Year:Western}
+$$
+
+Code to create the model: 
+
+```{r eval = F}
+genre_model <- glm(factor(binary) ~ year + Animation + Action + Adult + 
+                     Adventure + Biography + Comedy + Crime + 
+                     Documentary + Drama + Family + Fantasy + 
+                     History + Horror + Music + Musical +
+                     Mystery + Romance + Short + Sport + 
+                     Thriller + War + Western + year:Animation + 
+                     year:Action + year:Adult + year:Adventure + 
+                     year:Biography + year:Comedy + year:Crime +
+                     year:Documentary + year:Drama + year:Family +
+                     year:Fantasy + year:History + year:Horror + 
+                     year:Music + year:Musical + year:Mystery + 
+                     year:Romance + year:Short + year:Sport + 
+                     year:Thriller + year:War + year:Western,
+                   family = "binomial", data = movies_indi)
+```
+
+
+
+```{r warning = F, message = F, echo = F}
+movies_indi <- read_csv(here::here("data/movies_indicator.csv"))
+
+new_grid <- read_csv(here::here("data/movies_grid1.csv"))
+
+mod3 <- glm(factor(binary) ~ year + Animation + Action + Adult + Adventure +
+              Biography + Comedy + Crime + Documentary + Drama +
+              Family + Fantasy + History + Horror + Music +
+              Musical + Mystery + Romance + Short + Sport +
+              Thriller + War + Western +
+              year:Animation + year:Action + year:Adult + year:Adventure +
+              year:Biography + year:Comedy + year:Crime + year:Documentary + year:Drama +
+              year:Family + year:Fantasy + year:History + year:Horror + year:Music +
+              year:Musical + year:Mystery + year:Romance + year:Short + year:Sport +
+              year:Thriller + year:War + year:Western, 
+            family = "binomial", data = movies_indi)
+
+aug_mod3 <- augment(mod3, newdata = new_grid, se_fit = TRUE)
+
+aug_mod3 <- aug_mod3 |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
+
+list3 <- aug_mod3 |> pivot_longer(cols = c(Animation, Action, Adult, Adventure, Biography, Comedy, 
+                                           Crime, Documentary, Drama, Family, Fantasy, History, 
+                                           Horror, Music, Musical, Mystery, Romance, Short, 
+                                           Sport, Thriller, War, Western), names_to = "genre", 
+                                  values_to = "values")
+
+movies_pass <- movies_indi |> filter(binary == 1)
+movies_fail <- movies_indi |> filter(binary == 0)
+
+list3 |> filter(values == 1, genre %in% 
+                  c("Sport", "Comedy", "Romance", "Adventure", "Action", "Documentary", "War", "Western")) |> 
+  mutate(genre = fct_reorder2(genre, .x = year, .y = .pi)) |>
+  ggplot(aes(x = year, y = .pi)) +                      
+  geom_line(aes(color = genre), linewidth = 0.9) + 
+  geom_rug(data = movies_pass, aes(x = year, y = as.numeric(binary)), sides = "t") +  ## alpha = 0.4
+  geom_rug(data = movies_fail, aes(x = year, y = as.numeric(binary)), sides = "b") +  
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) + 
+  theme_minimal(base_size = 19) +
+  labs(x = "\nYear",
+       y = "Probabilty of Passing\n", 
+       color = "Genre",
+       title = "Different Genres Over Time") +
+  scale_color_viridis_d()
+```
+
+
+
+
+## Ratings Model
+
+
+$$
+logit(\pi) = \beta_0 + \beta_1 \cdot \text{Budget} + \beta_2 \cdot \text{Year} + \beta_3 \cdot \text{IMDb Rating} +  \text{ } \beta_4 \cdot \text{Metascore}
+$$
+
+Code to create the model: 
+
+```{r eval = F}
+movies <- movies %>% mutate(binary_0 = ifelse(binary == "PASS", 1, 0))
+
+mod_year <-  glm(binary_0 ~  budget_2013 +
+                  year + 
+                  imdb_rating +                 
+                  metascore,                     
+                data = movies, family = "binomial") 
+```
+
+
+
+```{r message = F, echo = F, warning = F}
+movies2 <- read_csv(here::here("data/movies_sentiment.csv"))
+
+movies2 <- movies2 %>% mutate(binary_0 = ifelse(binary == "PASS", 1, 0))
+
+mod_year <- glm(binary_0 ~  budget_2013 +
+                  year + 
+                  imdb_rating +                 
+                  metascore,                     
+                data = movies2, family = "binomial") 
+
+grid <- movies2 |>
+  data_grid(
+    year = seq_range(year, n = 4),
+    binary_0 = c(0, 1),
+    imdb_rating = seq_range(imdb_rating, n = 6),
+    budget_2013 = median(movies2$budget_2013, na.rm = T),
+    metascore = seq_range(metascore, n = 4)
+    )
+
+aug_year <- augment(mod_year, newdata = grid, se_fit = TRUE)
+aug_year <- aug_year |> mutate(.pi = exp(.fitted) / (1 + exp(.fitted)))
+
+ggplot(data = aug_year, aes(x = metascore, y = .pi)) +
+  geom_line(aes(color = as.factor(round(imdb_rating))), linewidth = 1) +
+  facet_wrap(~ year) + 
+  labs(y = "Probability of Passing Test",
+       x = "Metascore",       ## possibly scale the x-axis?
+       title = "Ratings and Budget Over Time") +
+  scale_color_viridis_d(name = "IMDB Rating") +
+  theme_minimal(base_size = 16)
+```
+
+
 
 model code without output
 
