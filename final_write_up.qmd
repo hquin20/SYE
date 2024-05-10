@@ -422,10 +422,6 @@ genre_model <- glm(factor(binary) ~ year + Animation + Action + Adult +
 genre_model |> pander::pander(caption = "Logistic Model Coefficients")
 ```
 
-```{r}
-0.01908 + -0.01187
-```
-
 To understand the relationship between specific genres and likelihood of passing of the Bechdel Test, individual coefficients for selected genres can be interpreted. For a one year increase in release year, the log odds is predicted to increase by 0.030 (0.01908 + 0.01093 = 0.03001) when the movie is considered an adventure film. This relationship has been proven to be statistically significant, with a p-value of 0.001. For animated movies, a one year increase in release year means the log odds is predicted to increase by 0.031 (0.01908 + 0.01204 = 0.031), with a p-value of 0.028. For western movies, a one year increase in release year results in a predicted 0.007 (0.01908 - 0.01187 = 0.00721) increase in log odds, a much slower rate than most other movie genres. 
 
 The following plots showcase these relationships well, along with the other genres included in the model. Each colored trend line represent a different movie genre, with year along the x-axis and the predicted probability of passing the Bechdel Test on the y-axis. The tick marks along the top and bottom of the plots represent the movies that pass and fail each year respectively. Each plot contains a different group of genres. The genres were plotted on multiple graphs for clarity. 

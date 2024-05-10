@@ -49,6 +49,7 @@ The code manual for the data from IMDb:
 Other data used comes from the TidyTuesday social data project through
 GitHub, found
 [here](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-09/readme.md).
+This data set contains 1,794 movies ranging from 1970 to 2013.
 
 | title          | year | imdb_rating | metascore | budget_2013 | binary |
 |:---------------|-----:|------------:|----------:|------------:|:-------|
@@ -72,9 +73,21 @@ The code manual for the TidyTuesday repository:
 
 ## Genres Model
 
+A logistic regression model was used to predict likelihood of passing
+the Bechdel test based on genre and release year. The model is shown
+below.
+
 $$
 logit(\pi) = \beta_0 + \beta_1 \cdot Year + \beta_2 \cdot \text{Animation} + \beta_3 \cdot \text{Action} + \beta_4 \cdot \text{Adult} + \text{ } \beta_5 \cdot \text{Adventure} +\ldots + \beta_{29} \cdot \text{Year:Western}
 $$
+
+- $\pi$ = probability of passing the test
+
+- $logit$ = log odds of passing the test
+
+- $Animation$ = 1 (*yes*) or 0 (*no*)
+
+- $Year:Western$ = interaction term
 
 Code to create the model:
 
@@ -97,11 +110,29 @@ genre_model <- glm(factor(binary) ~ year + Animation + Action + Adult +
 
 ![](README_files/figure-commonmark/unnamed-chunk-5-1.png)
 
+<u>**Interpretation**</u>
+
+For recent years, genres with **higher probability** of PASSING:
+
+- *Romance, Adventure, Comedy*
+
+Genres with **lower probability** of PASSING:
+
+- *War, Western, Sport*
+
 ## Ratings Model
+
+A logistic regression model was used to predict likelihood of passing
+the Bechdel test based on movie budget, release year, IMDb rating, and
+Metascore. The model is shown below.
 
 $$
 logit(\pi) = \beta_0 + \beta_1 \cdot \text{Budget} + \beta_2 \cdot \text{Year} + \beta_3 \cdot \text{IMDb Rating} +  \text{ } \beta_4 \cdot \text{Metascore}
 $$
+
+- $IMDb \text{ } Rating$ = **User** ratings
+
+- $Metascore$ = **Critic** ratings
 
 Code to create the model:
 
@@ -117,6 +148,18 @@ mod_year <-  glm(binary_0 ~  budget_2013 +
 
 ![](README_files/figure-commonmark/unnamed-chunk-7-1.png)
 
-model code without output
+<u>**Interpretation**</u>
 
-abbr model (latex)
+*Predicted probability* of a movie PASSING **increases** for:
+
+- Movies with **lower budgets**
+
+- Movies with **lower IMDb user ratings**
+
+- Movies with **higher critic ratings**
+
+### Limitations
+
+1.  Data for *Rating Analysis* only contains movies up to 2013
+
+2.  Bechdel data contains most popular movies reported by users
