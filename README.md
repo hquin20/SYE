@@ -57,7 +57,7 @@ This data set contains 1,794 movies ranging from 1970 to 2013.
 | Nebraska       | 2013 |         7.9 |        86 |    1.20e+07 | PASS   |
 | Now You See Me | 2013 |         7.3 |        50 |    7.50e+07 | FAIL   |
 
-The code manual for the TidyTuesday repository:
+The code manual for the TidyTuesday data:
 
 - **year**: release year
 
@@ -163,3 +163,10 @@ mod_year <-  glm(binary_0 ~  budget_2013 +
 1.  Data for *Rating Analysis* only contains movies up to 2013
 
 2.  Bechdel data contains most popular movies reported by users
+
+### Future Work
+
+Future research into the presence of women in film may analyze
+alternative methods than the Bechdel Test, such as number of lines,
+aspects of female protagonists, and characteristics of the writers and
+directors.

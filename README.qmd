@@ -52,7 +52,7 @@ movies |> select(title, year, imdb_rating, metascore, budget_2013, binary) |>
   slice(44:46) |>  knitr::kable() 
 ```
 
-The code manual for the TidyTuesday repository: 
+The code manual for the TidyTuesday data: 
 
 - **year**: release year
 
@@ -239,6 +239,12 @@ ggplot(data = aug_year, aes(x = metascore, y = .pi)) +
 1. Data for *Rating Analysis* only contains movies up to 2013
 
 2. Bechdel data contains most popular movies reported by users
+
+
+### Future Work
+
+Future research into the presence of women in film may analyze alternative methods than the Bechdel Test, such as number of lines, aspects of female protagonists, and characteristics of the writers and directors.
+
 
 
 
