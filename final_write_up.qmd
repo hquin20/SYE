@@ -1,6 +1,10 @@
 ---
 title: "Predicting Bechdel Test Results through Statistical Modeling"
-author: "Hailey Quintavalle"
+author: 
+  - name: "Hailey Quintavalle"
+  - name: "Advisor: Matt Higham"
+date: 05/10/2024
+date-format: "MMM D, YYYY"
 format: 
   pdf:
     toc: true
